@@ -1,5 +1,4 @@
-from random import *
-from numpy import *
+from random import * #Utilisé pour le calcul de la distance, à l'aide d'un générateur gaussien
 
 def milieu_triangle0 (Triangle(p1,p2,p3)) :
     C=Point(0,0,0) #somme des sommets du triangle
