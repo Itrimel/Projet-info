@@ -39,18 +39,17 @@ def creation_triangle(T,distance,centre):
     T3=Triangle(T.point2,T.point3,C)
     return[T1,T2,T3] #retourner les triangles dans une liste pour être compatible avec la boucle principale
 
-triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))
-distance = abs(gauss(1,0.1))
-liste=creation_triangle(triangle_0,distance,Point(0,0,-1))
+triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))#Tiangle de la base: points modifiables
+distance = abs(gauss(1,0.3))
+liste=creation_triangle(triangle_0,distance,Point(0,0,-1))#On fait la première étape à part
+centre_1=milieu_triangle(liste[0])
+centre_2=milieu_triangle(liste[1])
+centre_3=milieu_triangle(liste[2])
+centre=milieu_triangle(Triangle(centre_1,centre_2,centre_3))#On crée un point qui sera au centre de la montagne, et qui permettera de bien extruder vers l'extérieur
 for i in range(nb_etapes):
-    for j in range(int(len(liste)/3)):
-            centre_1=milieu_triangle(liste[3*j])
-            centre_2=milieu_triangle(liste[3*j+1])
-            centre_3=milieu_triangle(liste[3*j+2])
-            centre=milieu_triangle(Triangle(centre_1,centre_2,centre_3))#Ces lignes de calculs permettent de trouver un point qui,pour les 3 triangles, est à l'interieur de la montagne
-            for k in range(3):#On modifie les 3 triangles    
-                distance = abs(gauss(4**(-i-1),0.3**(i+1)))#Donne un nombre aléatoire selon une répartition gaussienne. A voir pour les paramètres ( le premier est la valeur moyenne, le second l’écart type)
-                liste=liste+creation_triangle(liste.pop(0),distance,centre)#Enlève un triangle à la liste pour ajouter les trois triangles qui en sont issus
+    for j in range(len(liste)):
+        distance = abs(gauss(4**(-i-1),3**(-i-1)))#Donne un nombre aléatoire selon une répartition gaussienne. A voir pour les paramètres ( le premier est la valeur moyenne, le second l’écart type)
+        liste=liste+creation_triangle(liste.pop(0),distance,centre)#Enlève un triangle à la liste pour ajouter les trois triangles qui en sont issus
 
 for i in range(len(liste)):#On transforme chaque élément de la liste, pour que le module d'affichage 3d puisse en faire qqchose
     triangle=liste[i]
