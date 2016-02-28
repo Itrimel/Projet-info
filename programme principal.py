@@ -31,8 +31,8 @@ def Normale(T, distance):
 def creation_triangle(T,distance):
     C=Normale(T,distance)
     T1=Triangle(A=T.point1,B=T.point2,C)
-    T2=Triangle(A=T.point1,B=T.point3,C=)
-    T3=Triangle(A=T.point2,B=T.point3,C=)
+    T2=Triangle(A=T.point1,B=T.point3,C)
+    T3=Triangle(A=T.point2,B=T.point3,C)
     return(T1,T2,T3) #retourner les triangles d'une façon spéciale ?
 
 triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))
