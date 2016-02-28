@@ -33,14 +33,14 @@ def creation_triangle(T,distance):
     T1=Triangle(T.point1,T.point2,C)
     T2=Triangle(T.point1,T.point3,C)
     T3=Triangle(T.point2,T.point3,C)
-    return[T1,T2,T3] #retourner les triangles d'une façon spéciale ?
+    return[T1,T2,T3] #retourner les triangles dans une liste pour être compatible avec la boucle principale
 
 triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))
 liste=[triangle_0]
 for i in range(nb_etapes):
     for j in range(len(liste)):
             distance = abs(gauss(4**(-i),0.1**(i+1)))#Donne un nombre aléatoire selon une répartition gaussienne. A voir pour les paramètres ( le premier est la valeur moyenne, le second l’écart type)
-            liste=liste+[liste.pop(0).creation_triangle(distance)]#Enlève un triangle à la liste pour ajouter les trois triangles qui en sont issus
+            liste=liste+creation_triangle(liste.pop(0))#Enlève un triangle à la liste pour ajouter les trois triangles qui en sont issus
 
 for i in range(len(liste)):#On transforme chaque élément de la liste, pour que le module d'affichage 3d puisse en faire qqchose
     triangle=liste[i]
