@@ -27,8 +27,8 @@ def Normale(T, distance,centre):
     n=pow(w[0]**2+w[1]**2+w[2]**2,1/2) #norme de w
     w=[w[0]/n,w[1]/n,w[2]/n]#w est normé. Il faut maintenant vérifier si w est dans le bon sens
     a=[centre.xP-M.xP,centre.yP-M.yP,centre.zP-M.zP]#Vecteur allant du centre du triangle au point centre, qui est à l'interieur de la structure
-    if w[0]*a[0]+w[1]*a[1]+w[2]*a[2]>0: #On fait le produit scalaire des 2 vecteurs. Si le produit scalaire est positif, cela signifie que les 2 vectuers sont environ du même sens, donc que w point vers l'interieur
-        w=[-1*w[0],-1*w[1],-1*w[2]]#On prend l'opposé de w, qui est normalement vers l'exterieur
+    if w[0]*a[0]+w[1]*a[1]+w[2]*a[2]>0: #On fait le produit scalaire des 2 vecteurs. Si le produit scalaire est positif, cela signifie que les 2 vecteurs sont environ du même sens, donc que w pointe vers l'interieur
+        w=[-1*w[0],-1*w[1],-1*w[2]]#On prend l'opposé de w, qui pointe alors vers l'exterieur
     p4=Point(M.xP + w[0]*distance, M.yP + w[1]*distance, M.zP + w[2]*distance)#point sur la normale
     return(p4)
 
