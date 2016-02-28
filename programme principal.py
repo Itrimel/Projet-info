@@ -21,3 +21,7 @@ for i in range(nb_etapes):
     for j in range(len(liste)):
             distance = abs(gauss(4**(-i),0.1**(i+1)))#Donne un nombre aléatoire selon une répartition gaussienne. A voir pour les paramètres ( le premier est la valeur moyenne, le second l’écart type)
             liste=liste+[liste.pop(0).creation_triangle(distance)]#Enlève un triangle à la liste pour ajouter les trois triangles qui en sont issus
+
+for i in range(len(liste)):#On transforme chaque élément de la liste, pour que le module d'affichage 3d puisse en faire qqchose
+    triangle=liste[i]
+    liste[i]=[(triangle.A.xP,tiangle.A.yP,triangle.A.zP),(triangle.B.xP,triangle.B.yP,triangle.B.zP),(triangle.C.xP,triangle.C.yP,triangle.C.zP)]
