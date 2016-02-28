@@ -24,4 +24,4 @@ for i in range(nb_etapes):
 
 for i in range(len(liste)):#On transforme chaque élément de la liste, pour que le module d'affichage 3d puisse en faire qqchose
     triangle=liste[i]
-    liste[i]=[(triangle.A.xP,tiangle.A.yP,triangle.A.zP),(triangle.B.xP,triangle.B.yP,triangle.B.zP),(triangle.C.xP,triangle.C.yP,triangle.C.zP)]
+    liste[i]=[(triangle.point1.xP,tiangle.point1.yP,triangle.point1.zP),(triangle.point2.xP,triangle.point2.yP,triangle.point2.zP),(triangle.point3.xP,triangle.point3.yP,triangle.point3.zP)]
