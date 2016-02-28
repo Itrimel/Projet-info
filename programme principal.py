@@ -24,7 +24,7 @@ def Normale(T, distance):
     u=[(T.point1.xP-T.point2.xP),(T.point1.yP-T.point2.yP),(T.point1.zP-T.point2.zP)]#On calcule les deux vecteurs
     v=[(T.point1.xP-T.point3.xP),(T.point1.yP-T.point3.yP),(T.point1.zP-T.point3.zP)]
     #Voilà fifi le produit vectoriel
-    w=([u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]])
+    w=[[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]]
     p4=Point(M.xP + w[0]*distance, M.yP + w[1]*distance, M.zP + w[2]*distance)#point sur la normale
     return(p4)
 
