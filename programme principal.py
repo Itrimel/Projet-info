@@ -39,7 +39,7 @@ def creation_triangle(T,distance,centre):
     T3=Triangle(T.point2,T.point3,C)
     return[T1,T2,T3] #retourner les triangles dans une liste pour être compatible avec la boucle principale
 
-triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))#Tiangle de la base: points modifiables
+triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))#Triangle de la base: points éventuellement modifiables
 distance = abs(gauss(1,0.3))
 liste=creation_triangle(triangle_0,distance,Point(0,0,-1))#On fait la première étape à part
 centre_1=milieu_triangle(liste[0])
