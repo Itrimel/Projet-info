@@ -43,7 +43,7 @@ triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))
 distance = abs(gauss(1,0.1))
 liste=creation_triangle(triangle_0,distance,Point(0,0,-1))
 for i in range(nb_etapes):
-    for j in range(len(liste)/3):
+    for j in range(int(len(liste)/3)):
             centre_1=milieu_triangle(liste[3*j])
             centre_2=milieu_triangle(liste[3*j+1])
             centre_3=milieu_triangle(liste[3*j+2])
