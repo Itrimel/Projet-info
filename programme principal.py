@@ -49,7 +49,7 @@ for i in range(nb_etapes):
             centre_3=milieu_triangle(liste[3*j+2])
             centre=milieu_triangle(Triangle(centre_1,centre_2,centre_3))#Ces lignes de calculs permettent de trouver un point qui,pour les 3 triangles, est à l'interieur de la montagne
             for k in range(3):#On modifie les 3 triangles    
-                distance = abs(gauss(4**(-i),0.1**(i+1)))#Donne un nombre aléatoire selon une répartition gaussienne. A voir pour les paramètres ( le premier est la valeur moyenne, le second l’écart type)
+                distance = abs(gauss(4**(-i-1),0.3**(i+1)))#Donne un nombre aléatoire selon une répartition gaussienne. A voir pour les paramètres ( le premier est la valeur moyenne, le second l’écart type)
                 liste=liste+creation_triangle(liste.pop(0),distance,centre)#Enlève un triangle à la liste pour ajouter les trois triangles qui en sont issus
 
 for i in range(len(liste)):#On transforme chaque élément de la liste, pour que le module d'affichage 3d puisse en faire qqchose
