@@ -23,7 +23,7 @@ def Normale(T, distance,centre):
     u=[(T.point1.xP-T.point2.xP),(T.point1.yP-T.point2.yP),(T.point1.zP-T.point2.zP)]#On calcule les deux vecteurs
     v=[(T.point1.xP-T.point3.xP),(T.point1.yP-T.point3.yP),(T.point1.zP-T.point3.zP)]
     #Voilà fifi le produit vectoriel
-    w=[[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]]
+    w=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]]
     n=pow(w[0]**2+w[1]**2+w[2]**2,1/2) #norme de w
     w=[w[0]/n,w[1]/n,w[2]/n]#w est normé. Il faut maintenant vérifier si w est dans le bon sens
     a=[centre.xP-M.xP,centre.yP-M.yP,centre.zP-M.zP]#Vecteur allant du centre du triangle au point centre, qui est à l'interieur de la structure
