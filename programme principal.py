@@ -21,17 +21,18 @@ def Normale0(Triangle(p1,p2,p3), distance):
     
 def Normale(T, distance):
     M=milieu_triangle(T)
-    u=array([(T.point1.xP-T.point2.xP),(T.point1.yP-T.point2.yP),(T.point1.zP-T.point2.zP)])#On calcule les deux vecteurs
-    v=array([(T.point1.xP-T.point3.xP),(T.point1.yP-T.point3.yP),(T.point1.zP-T.point3.zP)])
+    u=[(T.point1.xP-T.point2.xP),(T.point1.yP-T.point2.yP),(T.point1.zP-T.point2.zP)]#On calcule les deux vecteurs
+    v=[(T.point1.xP-T.point3.xP),(T.point1.yP-T.point3.yP),(T.point1.zP-T.point3.zP)]
     #Voilà fifi le produit vectoriel
-    w=array([(u[1])*(v[2])-(u[2])*(v[1]),(u[2])*(v[0])-(u[0])*(v[2]),(u[0])*(v[1])-(u[1])*(v[0])])
+    w=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]])
     p4=Point(M.xP + w[0]*distance, M.yP + w[1]*distance, M.zP + w[2]*distance)#point sur la normale
     return(p4)
 
 def creation_triangle(T,distance):
-    T1=Triangle(A=T.point1,B=T.point2,C=Normale(T,distance))
-    T2=Triangle(A=T.point1,B=T.point3,C=Normale(T,distance))
-    T3=Triangle(A=T.point2,B=T.point3,C=Normale(T,distance))
+    C=Normale(T,distance)
+    T1=Triangle(A=T.point1,B=T.point2,C)
+    T2=Triangle(A=T.point1,B=T.point3,C=)
+    T3=Triangle(A=T.point2,B=T.point3,C=)
     return(T1,T2,T3) #retourner les triangles d'une façon spéciale ?
 
 triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))
