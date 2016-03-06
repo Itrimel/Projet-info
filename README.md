@@ -7,4 +7,4 @@ Le fichier module_3d.py contient le code pour l'affichage des montagnes
 
 Le fichier programme principal.py contient la boucle principale du programme et les procédures d'Émeline et d'Estelle
 
-
+A la date du 6/03, le programme est entièrement compatible python 2.7
