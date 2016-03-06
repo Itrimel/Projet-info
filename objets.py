@@ -12,12 +12,10 @@ class Point:
         self.xP=xP
         self.yP=yP
         self.zP=zP
+        self.numpy=np.array([self.xP,self.yP,self.zP])
         
     def __str__(self): #affichage
         return(str((self.xP,self.yP,self.zP)))
-    
-    def numpy(self):
-        return np.array([self.xP,self.yP,self.zP])
         
     def setAbs(self,x): #changement d'abscisse
         self.xP=x
