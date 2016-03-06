@@ -1,3 +1,4 @@
+import numpy as np #Pour pouvoir exprimer les points sous formes d'arrays
 class Point:
     """ Définit un point avec trois coordonnées (x,y,z). Utilisation : A=Point(x,y,z)
      Commandes : elles s'utilisent toutes comme A.commande() avec éventuellement des arguments, sauf str
@@ -11,6 +12,7 @@ class Point:
         self.xP=xP
         self.yP=yP
         self.zP=zP
+        self.numpy=np.array([self.xP,self.yP,self.zP])
         
     def __str__(self): #affichage
         return(str((self.xP,self.yP,self.zP)))
