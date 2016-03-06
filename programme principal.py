@@ -20,11 +20,11 @@ def Normale0(Triangle(p1,p2,p3), distance):
     return(p4)
     
 def Normale(T, distance,centre):
-    M=milieu_triangle(T).numpy()#Expression des données dans un format permettant de faire des calculs plus facilement
-    p1=T.point1.numpy()
-    p2=T.point2.numpy()
-    p3=T.point3.numpy()
-    centre=centre.numpy()
+    M=milieu_triangle(T).numpy#Expression des données dans un format permettant de faire des calculs plus facilement
+    p1=T.point1.numpy
+    p2=T.point2.numpy
+    p3=T.point3.numpy
+    centre=centre.numpy
     u=p1-p2#On calcule les deux vecteurs
     v=p1-p3
     #Voilà fifi le produit vectoriel
