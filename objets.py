@@ -18,6 +18,9 @@ class Point:
     def __add__(self,other): #Additionner 2 points : p+q
         return Point(self.xP+other.xP,self.yP+other.yP,self.zP+other.zP)
     
+    def __sub__(self,other):# Soustraction : p-q
+        return self+other*(-1)
+    
     def __mul__(self,n):#Multiplier un point par un nombre : p*2
         return Point(self.xP*n,self.yP*n,self.zP*n)
     
