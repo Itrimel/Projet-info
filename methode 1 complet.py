@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #Nécessite Pyhton 2 avec le module mayavi installé
 from random import * #Utilisé pour le calcul de la distance, à l'aide d'un générateur gaussien
 import numpy as np #Pour l'affichage
@@ -36,7 +36,7 @@ class Point:
         L2=[other.xP,other.yP,other.zP]
         return L1[0]*L2[0]+L1[1]*L2[1]+L1[2]*L2[2]
 class Triangle:
-	def __init__(self, A=Point(0,0,0), B=Point(1,1,0), C=Point(2,-1,0)):
+    def __init__(self, A=Point(0,0,0), B=Point(1,1,0), C=Point(2,-1,0)):
     	self.point1=A
         self.point2=B
         self.point3=C
