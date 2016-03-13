@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #Nécessite Pyhton 2 avec le module mayavi installé
 from random import * #Utilisé pour le calcul de la distance, à l'aide d'un générateur gaussien
-import numpy as np
+import numpy as np #Pour l'affichage
 import os #Module pour rennomer le fichier à la fin
 from mayavi import mlab #Module pour générer le dessin
 import Tkinter, tkFileDialog #Module pour que l'utilisateur choisisse l'endroit où enregistrer
@@ -10,52 +10,61 @@ class Point:
         self.xP=xP
         self.yP=yP
         self.zP=zP
-        self.numpy=np.array([self.xP,self.yP,self.zP])
+
+    def __add__(self,other): #Additionner 2 points : p+q
+        return Point(self.xP+other.xP,self.yP+other.yP,self.zP+other.zP)
+    
+    def __sub__(self,other):# Soustraction : p-q
+        return self+other*(-1)
+    
+    def __mul__(self,n):#Multiplier un point par un nombre : p*2
+        return Point(self.xP*n,self.yP*n,self.zP*n)
+    
+    def __rmul__(self,n):#Multiplier un point par un nombre : 2*p
+        return Point(self.xP*n,self.yP*n,self.zP*n)
+    
+    def __truediv__(self,n):#Diviser un point par un nombre
+        return Point(self.xP/n,self.yP/n,self.zP/n)
+    
+    def __xor__(self,other):# Produit vectoriel : p^q
+        L1=[self.xP,self.yP,self.zP]  
+        L2=[other.xP,other.yP,other.zP]
+        return Point(L1[1]*L2[2]-L1[2]*L2[1],L1[2]*L2[0]-L1[0]*L2[2],L1[0]*L2[1]-L1[1]*L2[0])
+    
+    def __and__(self,other):#Produit scalaire : p & q
+        L1=[self.xP,self.yP,self.zP]  
+        L2=[other.xP,other.yP,other.zP]
+        return L1[0]*L2[0]+L1[1]*L2[1]+L1[2]*L2[2]
 class Triangle:
-    def __init__(self, A=Point(0,0,0), B=Point(1,1,0), C=Point(2,-1,0)): 
-        self.point1=A
+	def __init__(self, A=Point(0,0,0), B=Point(1,1,0), C=Point(2,-1,0)):
+    	self.point1=A
         self.point2=B
         self.point3=C
-        self.absPoint1=A.xP
-        self.absPoint2=B.xP
-        self.absPoint3=C.xP
-        self.ordPoint1=A.yP
-        self.ordPoint2=B.yP
-        self.ordPoint3=C.yP
-        self.altPoint1=A.zP
-        self.altPoint2=B.zP
-        self.altPoint3=C.zP
-        self.__d1=self.point1.dist(self.point2)
-        self.__d2=self.point2.dist(self.point3)
-        self.__d3=self.point3.dist(self.point1)
 
 
 def milieu_triangle (T) :
     '''Retourne sous forme d'un ponit le centre du triangle donné en argument'''
-    C=Point(0,0,0) #somme des sommets du triangle
-    C=Point((T.point1.xP+T.point2.xP+T.point3.xP)/3,(T.point1.yP+T.point2.yP+T.point3.yP)/3,(T.point1.zP+T.point2.zP+T.point3.zP)/3)#C devient le centre du triangle
+    C= (T.point1+T.point2+T.point3)/3 #C devient le centre du triangle
     return(C)
 
     
 def Normale(T, distance,centre):
     '''Retourne trois triangles issus du triangle T dont le centre a été déplacé de la distance distance.
        L'argument centrepermet de déterminer l'intérieur de la structure'''
-    M=milieu_triangle(T).numpy#Expression des données dans un format permettant de faire des calculs plus facilement
-    p1=T.point1.numpy
-    p2=T.point2.numpy
-    p3=T.point3.numpy
-    centre=centre.numpy
+    M=milieu_triangle(T)
+    p1=T.point1
+    p2=T.point2
+    p3=T.point3
     u=p1-p2#On calcule les deux vecteurs
     v=p1-p3
     #Voilà fifi le produit vectoriel
-    w=np.cross(u,v)
-    norme=np.linalg.norm(w) #Norme de w 
-    w=w/norme #w est maintenant normé   
-    a=centre-M #Vecteur allant du centre du triangle au point centre, qui est à l'interieur de la structure    
-    if np.dot(w,a)>0: #On fait le produit scalaire des 2 vecteurs. Si le produit scalaire est positif, cela signifie que les 2 vecteurs sont environ du même sens, donc que w pointe vers l'interieur
-        w=-1*w #On prend l'opposé de w, qui pointe alors vers l'exterieur
-    p4=M+distance*w# point sur la normale   
-    p4=Point(p4[0],p4[1],p4[2])
+    w=u^v
+    norme=(u & u)**1/2 #Norme de w=produit scalaire par lui même à la racine carrée
+    w=w/norme#w est maintenant normé
+    a=centre-M#Vecteur allant du centre du triangle au point centre, qui est à l'interieur de la structure
+    if w & a >0: #On fait le produit scalaire des 2 vecteurs. Si le produit scalaire est positif, cela signifie que les 2 vecteurs sont environ du même sens, donc que w pointe vers l'interieur
+        w=-1*w#On prend l'opposé de w, qui pointe alors vers l'exterieur
+    p4=M+distance*w#point sur la normale
     return(p4)
     
 def creation_triangle(T,distance,centre):
