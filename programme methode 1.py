@@ -1,5 +1,4 @@
 from random import * #Utilisé pour le calcul de la distance, à l'aide d'un générateur gaussien
-import numpy as np #Pour pouvoir faire des calculs sur le vecteurs plus facilement
 
 def milieu_triangle0 (Triangle(p1,p2,p3)) :
     C=Point(0,0,0) #somme des sommets du triangle
@@ -7,8 +6,7 @@ def milieu_triangle0 (Triangle(p1,p2,p3)) :
     return (C)
 
 def milieu_triangle (T) :
-    C=Point(0,0,0) #somme des sommets du triangle
-    C=Point((T.point1.xP+T.point2.xP+T.point3.xP)/3,(T.point1.yP+T.point2.yP+T.point3.yP)/3,(T.point1.zP+T.point2.zP+T.point3.zP)/3)#C devient le centre du triangle
+    C= (T.point1+T.point2+T.point3)/3 #C devient le centre du triangle
     return(C)
 
 def Normale0(Triangle(p1,p2,p3), distance):
@@ -20,22 +18,20 @@ def Normale0(Triangle(p1,p2,p3), distance):
     return(p4)
     
 def Normale(T, distance,centre):
-    M=milieu_triangle(T).numpy#Expression des données dans un format permettant de faire des calculs plus facilement
-    p1=T.point1.numpy
-    p2=T.point2.numpy
-    p3=T.point3.numpy
-    centre=centre.numpy
+    M=milieu_triangle(T)
+    p1=T.point1
+    p2=T.point2
+    p3=T.point3
     u=p1-p2#On calcule les deux vecteurs
     v=p1-p3
     #Voilà fifi le produit vectoriel
-    w=np.cross(u,v)
-    norme=np.linalg.norm(w)#Norme de w
+    w=u^v
+    norme=(u & u)**1/2 #Norme de w=produit scalaire par lui même à la racine carrée
     w=w/norme#w est maintenant normé
     a=centre-M#Vecteur allant du centre du triangle au point centre, qui est à l'interieur de la structure
-    if np.dot(w,a)>0: #On fait le produit scalaire des 2 vecteurs. Si le produit scalaire est positif, cela signifie que les 2 vecteurs sont environ du même sens, donc que w pointe vers l'interieur
+    if w & a >0: #On fait le produit scalaire des 2 vecteurs. Si le produit scalaire est positif, cela signifie que les 2 vecteurs sont environ du même sens, donc que w pointe vers l'interieur
         w=-1*w#On prend l'opposé de w, qui pointe alors vers l'exterieur
     p4=M+distance*w#point sur la normale
-    p4=Point(p4[0],p4[1],p4[2])
     return(p4)
 
 def creation_triangle(T,distance,centre):
