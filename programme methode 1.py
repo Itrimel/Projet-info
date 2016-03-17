@@ -26,7 +26,7 @@ def Normale(T, distance,centre):
     v=p1-p3
     #Voilà fifi le produit vectoriel
     w=u^v
-    norme=(u & u)**1/2 #Norme de w=produit scalaire par lui même à la racine carrée
+    norme=(w & w)**1/2 #Norme de w=produit scalaire par lui même à la racine carrée
     w=w/norme#w est maintenant normé
     a=centre-M#Vecteur allant du centre du triangle au point centre, qui est à l'interieur de la structure
     if w & a >0: #On fait le produit scalaire des 2 vecteurs. Si le produit scalaire est positif, cela signifie que les 2 vecteurs sont environ du même sens, donc que w pointe vers l'interieur
