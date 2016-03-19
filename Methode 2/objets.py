@@ -1,4 +1,4 @@
-class Point:
+﻿class Point:
     """ Définit un point avec trois coordonnées (x,y,z). Utilisation : A=Point(x,y,z)
      Commandes : elles s'utilisent toutes comme A.commande() avec éventuellement des arguments, sauf str
      - str , pour afficher le point (str(A)), rend : (x,y,z)
@@ -28,6 +28,9 @@ class Point:
         return Point(self.xP*n,self.yP*n,self.zP*n)
     
     def __truediv__(self,n):#Diviser un point par un nombre
+        return Point(self.xP/n,self.yP/n,self.zP/n)
+
+    def __div__(self,n):#Même chose que truediv, mais pour python 2
         return Point(self.xP/n,self.yP/n,self.zP/n)
     
     def __xor__(self,other):# Produit vectoriel : p^q
