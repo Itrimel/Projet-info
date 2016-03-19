@@ -41,7 +41,7 @@ class Point:
 
 class Triangle:
     def __init__(self, A=Point(0,0,0), B=Point(1,1,0), C=Point(2,-1,0)):
-    	self.point1=A
+        self.point1=A
         self.point2=B
         self.point3=C
 
