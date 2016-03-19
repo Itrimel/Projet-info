@@ -1,4 +1,3 @@
-import numpy as np #Pour pouvoir exprimer les points sous formes d'arrays
 class Point:
     """ Définit un point avec trois coordonnées (x,y,z). Utilisation : A=Point(x,y,z)
      Commandes : elles s'utilisent toutes comme A.commande() avec éventuellement des arguments, sauf str
@@ -12,10 +11,34 @@ class Point:
         self.xP=xP
         self.yP=yP
         self.zP=zP
-        self.numpy=np.array([self.xP,self.yP,self.zP])
         
     def __str__(self): #affichage
         return(str((self.xP,self.yP,self.zP)))
+    
+    def __add__(self,other): #Additionner 2 points : p+q
+        return Point(self.xP+other.xP,self.yP+other.yP,self.zP+other.zP)
+    
+    def __sub__(self,other):# Soustraction : p-q
+        return self+other*(-1)
+    
+    def __mul__(self,n):#Multiplier un point par un nombre : p*2
+        return Point(self.xP*n,self.yP*n,self.zP*n)
+    
+    def __rmul__(self,n):#Multiplier un point par un nombre : 2*p
+        return Point(self.xP*n,self.yP*n,self.zP*n)
+    
+    def __truediv__(self,n):#Diviser un point par un nombre
+        return Point(self.xP/n,self.yP/n,self.zP/n)
+    
+    def __xor__(self,other):# Produit vectoriel : p^q
+        L1=[self.xP,self.yP,self.zP]  
+        L2=[other.xP,other.yP,other.zP]
+        return Point(L1[1]*L2[2]-L1[2]*L2[1],L1[2]*L2[0]-L1[0]*L2[2],L1[0]*L2[1]-L1[1]*L2[0])
+    
+    def __and__(self,other):#Produit scalaire : p & q
+        L1=[self.xP,self.yP,self.zP]  
+        L2=[other.xP,other.yP,other.zP]
+        return L1[0]*L2[0]+L1[1]*L2[1]+L1[2]*L2[2]
         
     def setAbs(self,x): #changement d'abscisse
         self.xP=x
