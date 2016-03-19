@@ -48,7 +48,7 @@ class Triangle:
 
 def milieu_triangle (T) :
     '''Retourne sous forme d'un ponit le centre du triangle donné en argument'''
-    C= (T.point1+T.point2+T.point3)/3 #C devient le centre du triangle
+    C= (T.point1+T.point2+T.point3)/3.0 #C devient le centre du triangle
     return(C)
 
     

@@ -2,7 +2,7 @@
 
 def milieu_triangle0 (Triangle(p1,p2,p3)) :
     C=Point(0,0,0) #somme des sommets du triangle
-    C=Point((xp1+xp2+xp3)/3,(yp1+yp2+yp3)/3,(zp1+zp2+zp3)/3)#C devient le centre du triangle
+    C=Point((xp1+xp2+xp3)/3,(yp1+yp2+yp3)/3,(zp1+zp2+zp3)/3.0)#C devient le centre du triangle
     return (C)
 
 def milieu_triangle (T) :
