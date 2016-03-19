@@ -23,6 +23,9 @@ class Point:
     def __rmul__(self,n):#Multiplier un point par un nombre : 2*p
         return Point(self.xP*n,self.yP*n,self.zP*n)
     
+    def __div__(self,n):#Diviser un point par un nombre
+        return Point(self.xP/n,self.yP/n,self.zP/n)
+
     def __truediv__(self,n):#Diviser un point par un nombre
         return Point(self.xP/n,self.yP/n,self.zP/n)
     
@@ -35,6 +38,7 @@ class Point:
         L1=[self.xP,self.yP,self.zP]  
         L2=[other.xP,other.yP,other.zP]
         return L1[0]*L2[0]+L1[1]*L2[1]+L1[2]*L2[2]
+
 class Triangle:
     def __init__(self, A=Point(0,0,0), B=Point(1,1,0), C=Point(2,-1,0)):
     	self.point1=A
@@ -59,7 +63,7 @@ def Normale(T, distance,centre):
     v=p1-p3
     #Voilà fifi le produit vectoriel
     w=u^v
-    norme=(u & u)**1/2 #Norme de w=produit scalaire par lui même à la racine carrée
+    norme=(float(w & w))**1/2 #Norme de w=produit scalaire par lui même à la racine carrée
     w=w/norme#w est maintenant normé
     a=centre-M#Vecteur allant du centre du triangle au point centre, qui est à l'interieur de la structure
     if w & a >0: #On fait le produit scalaire des 2 vecteurs. Si le produit scalaire est positif, cela signifie que les 2 vecteurs sont environ du même sens, donc que w pointe vers l'interieur
