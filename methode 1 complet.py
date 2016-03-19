@@ -110,21 +110,21 @@ def creation_image(liste,save="True",chemin="ask"):
 		os.rename(chemin, nom + ".wrl")#Instruction permettant de renommer le fichier "chemin2" en nom +".wrl", qui est le même nom, à l'extension et un nombre à la fin près
 		#Fin du bloc
 
-def proc():
-	triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))
-	distance = abs(gauss(1,0.2))
-	liste=creation_triangle(triangle_0,distance,Point(0,0,-1))
-	centre_1=milieu_triangle(liste[0])
-	centre_2=milieu_triangle(liste[1])
-	centre_3=milieu_triangle(liste[2])
-	centre=milieu_triangle(Triangle(centre_1,centre_2,centre_3))
-	for i in range(6):
-		for j in range(len(liste)):
-			distance = abs(gauss(4**(-i-1),0.2**(i+1)))#Donne un nombre aléatoire selon une répartition gaussienne. A voir pour les paramètres ( le premier est la valeur moyenne, le second l’écart type)
-			liste=liste+creation_triangle(liste.pop(0),distance,centre)#Enlève un triangle à la liste pour ajouter les trois triangles qui en sont issus
 
-	for i in range(len(liste)):#On transforme chaque élément de la liste, pour que le module d'affichage 3d puisse en faire qqchose
-		triangle=liste[i]
-		liste[i]=[(triangle.point1.xP,triangle.point1.yP,triangle.point1.zP),(triangle.point2.xP,triangle.point2.yP,triangle.point2.zP),(triangle.point3.xP,triangle.point3.yP,triangle.point3.zP)]
-	creation_image(liste)
+triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))
+distance = abs(gauss(1,0.2))
+liste=creation_triangle(triangle_0,distance,Point(0,0,-1))
+centre_1=milieu_triangle(liste[0])
+centre_2=milieu_triangle(liste[1])
+centre_3=milieu_triangle(liste[2])
+centre=milieu_triangle(Triangle(centre_1,centre_2,centre_3))
+for i in range(6):
+	for j in range(len(liste)):
+		distance = abs(gauss(4**(-i-1),0.2**(i+1)))#Donne un nombre aléatoire selon une répartition gaussienne. A voir pour les paramètres ( le premier est la valeur moyenne, le second l’écart type)
+		liste=liste+creation_triangle(liste.pop(0),distance,centre)#Enlève un triangle à la liste pour ajouter les trois triangles qui en sont issus
+
+for i in range(len(liste)):#On transforme chaque élément de la liste, pour que le module d'affichage 3d puisse en faire qqchose
+	triangle=liste[i]
+	liste[i]=[(triangle.point1.xP,triangle.point1.yP,triangle.point1.zP),(triangle.point2.xP,triangle.point2.yP,triangle.point2.zP),(triangle.point3.xP,triangle.point3.yP,triangle.point3.zP)]
+creation_image(liste)
 
