@@ -10,14 +10,14 @@ def creation_image(liste,save="True",chemin="ask"):
 	Y=[]
 	Z=[]
         tri=[]
-	for k in range(1,len(liste)):
-		nb_a=(k-1)*k/2
-		nb_b=nb_a+k
+	for k in range(1,len(liste)): #Création de la liste des triangles : on s'intéresse ici aux triangles entre la ligne k-1 et k
+		nb_a=(k-1)*k/2 #Position globale du premier point de la ligne k-1
+		nb_b=nb_a+k #Position globale du premier point de la ligne k
 		for i in range(k-1):
-			tri+=[(nb_a,nb_b,nb_b+1),(nb_a,nb_a+1,nb_b+1)]
-			nb_a+=1
+			tri+=[(nb_a,nb_b,nb_b+1),(nb_a,nb_a+1,nb_b+1)] #On ajoute 2 triangles
+			nb_a+=1 #On passe aux points prochains
 			nb_b+=1
-		tri+=[(nb_a,nb_b,nb_b+1)]                  
+		tri+=[(nb_a,nb_b,nb_b+1)] #On ajoute le dernier triangle
 	for ligne in liste:
 		for point in ligne: #On ajoute les coordonnées des points une à une aux différentes listes
 			X=X+[point.xP]
