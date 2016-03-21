@@ -5,7 +5,7 @@
     long=len(ligne)
     for k in range(long-1):
         point=(ligne[k]+ligne[k+1])/2.0 #Les points à ajouter sont les milieux des segments
-        #Bouger le point selon la normale à déterminer
+        point = point + Point(0,0,gauss(0.3**(i-1),0.25**i)) #Déplace le point verticalement
         ligne2=ligne2+[point,ligne[k+1]]#On ajoute un point crée, puis un point existant, qui ne bouge pas
     return [ligne2]
 
@@ -20,10 +20,10 @@ def modif_rang_creation(liste,pos,i):
     pos_b=1
     for k in range(pos-1):
         point1=(ligne_a[pos_a]+ligne_b[pos_b])/2.0
-        #Rajouter commande pour bouger point
+        point1 = point1 + Point(0,0,gauss(0.3**(i-1),0.25**i)) #Déplace le point verticalement
         pos_a+=1 #On ajuste la position du point de la première ligne afin d'obtenir le prochain point 
         point2=(ligne_a[pos_a]+ligne_b[pos_b])/2.0
-        #Rajouter commande pour bouger point
+        point2 = point2 + Point(0,0,gauss(0.3**(i-1),0.25**i)) #Déplace le point verticalement
         pos_b+=1 #On ajuste la position du point de la deuxième ligne afin d'obtenir le prochain point lors du prochain passage dans la boucle
         ligne_nouv=ligne_nouv+[point1,point2] #On ajoute les 2 points à la ligne
     ligne_nouv=ligne_nouv+[(ligne_a[-1]+ligne_b[-1])/2.0] #On ajoute le dernier point, milieu des 2 derniers points des 2 lignes
@@ -36,7 +36,8 @@ for i in range(nb_etapes):
 	liste2=[liste[0]] 
 	#Cette liste contiendra le triangle avec ses nouveaux points. On commence par mettre la première ligne de 1 point, qui ne change jamais
 	#La liste contenant le triangle précédant ne sera pas modifiée 
-    	for pos in range(1,len(liste)):
+    	for pos in range(1,len(liste)-1):#On crée toutes les nouvelles lignes, sauf les 2 dernières
             	#Lors de l'ajout de nouveaux points, il se passe 2 choses : on créé de nouvelles lignes, et on ajoute des points aux lignes existantes, d'où les 2 procédures
 		liste2 = liste2 + modif_rang_creation(liste,pos,i) + modif_rang_ajout(liste,pos,i)
+	liste2= liste2 + modif_rang_creation(liste,len(liste)-1,i) + modif_rang_ajout(liste,len(liste)-1,10**3)#On fait à part, car les points de la dernière ligne ne doivent pas être bougés en hauteur, d'où le 10^3
 	liste=liste2 #La liste principale est modifiée, car le nouveau triangle est totalement construit
