@@ -1,33 +1,32 @@
 # -*- coding: utf-8 -*-
-from sympy import N
-from random import gauss
-import Tkinter, tkFileDialog #Module pour que l'utilisateur choisisse l'endroit o˘ enregistrer
-import numpy as np #Module pour l'organisation des coordonnÈes pour l'affichage
-import os #Module pour rennomer le fichier ‡ la fin
-from mayavi import mlab #Module pour gÈnÈrer le dessin
-class Point:
-
-    def __init__(self, xP=0, yP=0, zP=0): #valeurs par dÈfaut : (0,0,0)
+from sympy import N #Pour faire les arrondis lors des tests d'√©galit√©. N√©cessite donc l'installation de sympy
+from random import gauss #Pour faire les d√©placement al√©atoires
+import Tkinter, tkFileDialog #Module pour que l'utilisateur choisisse l'endroit o√π enregistrer
+import numpy as np #Module pour l'organisation des coordonn√©es pour l'affichage
+import os #Module pour rennomer le fichier √† la fin
+from mayavi import mlab #Module pour g√©n√©rer le dessin
+class Point:#Fonctionne comme un vecteur
+    def __init__(self, xP=0, yP=0, zP=0): #valeurs par d√©faut : (0,0,0)
         self.xP=xP
         self.yP=yP
         self.zP=zP
     
-    def __add__(self,other):
+    def __add__(self,other):#Addition de 2 points/vecteurs
         return Point(self.xP+other.xP,self.yP+other.yP,self.zP+other.zP)
     
-    def __mul__(self,n):
+    def __mul__(self,n):#Multiplication d'un point/vecteur par un scalaire
         return Point(self.xP*n,self.yP*n,self.zP*n)
     
-    def __rmul__(self,n):
+    def __rmul__(self,n):#Multiplication d'un point/vecteur par un scalaire
         return Point(self.xP*n,self.yP*n,self.zP*n)
     
-    def __truediv__(self,n):
+    def __truediv__(self,n):#Division d'un point/vecteur par un scalaire
         return Point(self.xP/n,self.yP/n,self.zP/n)
 
-    def __div__(self,n):
+    def __div__(self,n):#Division d'un point/vecteur par un scalaire pour Python 2
         return Point(self.xP/n,self.yP/n,self.zP/n)
     
-    def __sub__(self,other):
+    def __sub__(self,other):#Soustraction de 2 points/vecteurs
         return self+other*(-1)
     
     def __xor__(self,other):# Produit vectoriel : p^q
@@ -43,128 +42,128 @@ class Point:
     def __str__(self): #affichage
         return(str((self.xP,self.yP,self.zP)))
         
-    def __eq__(self,other):
+    def __eq__(self,other):#Teste si Point A == Point B .Retourne un bool√©en
         if N(self.xP,7)==N(other.xP,7) and N(self.yP,7)==N(other.yP,7) and N(self.zP,7)==N(other.zP,7):
             return True
         else:
             return False
     
-    def __ne__(self,other):
+    def __ne__(self,other):#Teste si Point A != Point B .Retourne un bool√©en
         return not self==other
 
 def creation_image(liste,save="True",chemin="ask"):
-	'''CrÈÈ le dessin, ‡ partir d'une liste de points.
-	La variable save gËre si l'image est enregistrÈe (Par dÈfaut,oui), ‡ l'emplacement "chemin". Par dÈfaut,l'emplacement est demandÈ ‡ l'utilisateur'''
-	X=[]#Initialisation des 3 listes contenant les coordonnÈes des sommets des triangles
+	'''Cr√©√© le dessin, √† partir d'une liste de points.
+	La variable save g√®re si l'image est enregistr√©e (Par d√©faut,oui), √† l'emplacement "chemin". Par d√©faut,l'emplacement est demand√© √† l'utilisateur'''
+	X=[]#Initialisation des 3 listes contenant les coordonn√©es des sommets des triangles
 	Y=[]
 	Z=[]
-        tri=[]
+        tri=[]#Liste contenant les triplets de points des sommets des triangles
+	#La proc√©dure d'origine permet de cr√©er les sous triangles √† partir de la taille de la liste pour un triangle, pour le premier sommet du triangle comptant comme le point 0
+	#Vu qu'on a ici plusieurs triangles, la variable pos va compter le nombre de points pr√©sents avant le premier sommet afin de ne pas avoir les m√™mes sous triangles qui se r√©petent
 	pos=0
-	for triangle in liste:
-		print(pos)
-		for k in range(1,len(triangle)): #CrÈation de la liste des triangles : on s'intÈresse ici aux triangles entre la ligne k-1 et k
+	for triangle in liste:#Pour chaque triangle d'origine, on fait la m√©thode
+		for k in range(1,len(triangle)): #Cr√©ation de la liste des sous triangles : on s'int√©resse ici aux sous triangles entre la ligne k-1 et k
 			nb_a=(k-1)*k/2 #Position globale du premier point de la ligne k-1
 			nb_b=nb_a+k #Position globale du premier point de la ligne k
 			for i in range(k-1):
-				tri+=[(pos+nb_a,pos+nb_b,pos+nb_b+1),(pos+nb_a,pos+nb_a+1,pos+nb_b+1)] #On ajoute 2 triangles
+				tri+=[(pos+nb_a,pos+nb_b,pos+nb_b+1),(pos+nb_a,pos+nb_a+1,pos+nb_b+1)] #On ajoute 2 triangles. On ajoute la variable pos afin de prendre en compte le d√©calage cr√©e par les autres triangles principaux cr√©es avant
 				nb_a+=1 #On passe aux points prochains
 				nb_b+=1
-			tri+=[(pos+nb_a,pos+nb_b,pos+nb_b+1)] #On ajoute le dernier triangle
+			tri+=[(pos+nb_a,pos+nb_b,pos+nb_b+1)] #On ajoute le dernier sous triangle. Toujours la m√™me chose pour pos
 		for ligne in triangle:
-			for point in ligne: #On ajoute les coordonnÈes des points une ‡ une aux diffÈrentes listes
-				pos+=1
+			for point in ligne: #On ajoute les coordonn√©es des points une √† une aux diff√©rentes listes
+				pos+=1#On incr√©mente pos pour chaque point, afin de bien d√©caler les prochain sous triangles cr√©es
 				X=X+[point.xP]
 				Y=Y+[point.yP]
 				Z=Z+[point.zP]
 	X=np.array(X)#Les listes sont converties en un format reconnu par mlab
 	Y=np.array(Y)
 	Z=np.array(Z)
-	fig=mlab.triangular_mesh(X,Y,Z,tri) #La figure est dessinÈe
+	fig=mlab.triangular_mesh(X,Y,Z,tri,colormap="gist_earth") #La figure est dessin√©e, avec de bonnes couleurs
 	if save: #Instructions pour la sauvegarde du fichier
-		if chemin=="ask": #Instructions pour demander ‡ l'utilisateur l'emplacement du fichier
+		if chemin=="ask": #Instructions pour demander √† l'utilisateur l'emplacement du fichier
 			root = Tkinter.Tk()
 			root.withdraw()
 			chemin = tkFileDialog.asksaveasfilename(parent=root,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")
-		mlab.savefig(chemin)#Le fichier est enregistrÈ
-		#Bloc pour modifier l'extension du fichier, et faire en sorte de ne pas effacer un autre fichier image. L'extension doit Ítre modifiÈe, car, pour Blender, les fichiers VRML ont une extension en .wrl
-		nom, ext = os.path.splitext(chemin) #Le nom et l'extension du fichier sont sÈparÈs
-		i=0# Le fichier est nommÈ par dÈfaut image. Pour ne pas effacer d'autres fichiers, on rajoute _i ‡ la fin du nom, o˘ i est un nombre. i est incrÈmentÈ jusqu'‡ ce que l'emplacement soit disponible
+		mlab.savefig(chemin)#Le fichier est enregistr√©
+		#Bloc pour modifier l'extension du fichier, et faire en sorte de ne pas effacer un autre fichier image. L'extension doit √™tre modifi√©e, car, pour Blender, les fichiers VRML ont une extension en .wrl
+		nom, ext = os.path.splitext(chemin) #Le nom et l'extension du fichier sont s√©par√©s
+		i=0# Le fichier est nomm√© par d√©faut image. Pour ne pas effacer d'autres fichiers, on rajoute _i √† la fin du nom, o√π i est un nombre. i est incr√©ment√© jusqu'√† ce que l'emplacement soit disponible
 		nom=nom+"_"
 		while os.path.isfile(nom+str(i)+".wrl"):#Instrction testant si le fichier existe, et renvoyant true si c'est le cas
 			i+=1
 		nom=nom+str(i)
-		os.rename(chemin, nom + ".wrl")#Instruction permettant de renommer le fichier "chemin" en nom +".wrl", qui est le mÍme nom, ‡ l'extension et un nombre ‡ la fin prËs
+		os.rename(chemin, nom + ".wrl")#Instruction permettant de renommer le fichier "chemin" en nom +".wrl", qui est le m√™me nom, √† l'extension et un nombre √† la fin pr√®s
 		#Fin du bloc
 
 def modif_rang_ajout(liste,pos,i):
-    '''Cette procÈdure permet d'ajouter des points ‡ des lignes dÈj‡ existantes'''
+    '''Cette proc√©dure permet d'ajouter des points √† des lignes d√©j√† existantes'''
     ligne=liste[pos]#On stocke la ligne sur laquelle on travaille    
-    ligne2=[ligne[0]]#On crÈe une nouvelle ligne qui contiendra les modifications : elle contient de base le premier point qui ne bougera pas
+    ligne2=[ligne[0]]#On cr√©e une nouvelle ligne qui contiendra les modifications : elle contient de base le premier point qui ne bougera pas
     long=len(ligne)
     for k in range(long-1):
-        point=(ligne[k]+ligne[k+1])/2.0 #Les points ‡ ajouter sont les milieux des segments
-        point = point + Point(0,0,gauss(0,0.25**i)) #DÈplace le point verticalement
-        ligne2=ligne2+[point,ligne[k+1]]#On ajoute un point crÈe, puis un point existant, qui ne bouge pas
+        point=(ligne[k]+ligne[k+1])/2.0 #Les points √† ajouter sont les milieux des segments
+        point = point + Point(0,0,gauss(0,0.25**i)) #D√©place le point verticalement
+        ligne2=ligne2+[point,ligne[k+1]]#On ajoute un point cr√©e, puis un point existant, qui ne bouge pas
     return [ligne2]
 
 def modif_rang_creation(liste,pos,i,cote_0,cote_2,nb_etapes):
-    '''Cette procÈdure permet de crÈer une nouvelle ligne de points'''
-    ligne_a=liste[pos-1] #On stocke les 2 lignes entre lesquelles sera ajoutÈ la nouvelle ligne
+    '''Cette proc√©dure permet de cr√©er une nouvelle ligne de points'''
+    ligne_a=liste[pos-1] #On stocke les 2 lignes entre lesquelles sera ajout√© la nouvelle ligne
     ligne_b=liste[pos]
-    if cote_0:
-        ligne_nouv=[cote_0[(2*pos-1)*(2**(nb_etapes-i-1))]]
+    if cote_0:#Si ce cot√© a √©t√© d√©ja fait, cote_0 est une liste et la boucle if sera activ√©e. Si il n'a pas √©t√© fait, cote_0 contien False, le la boucle else sera activ√©e
+        ligne_nouv=[cote_0[(2*pos-1)*(2**(nb_etapes-i-1))]]#On cr√©e la nouvelle ligne avec le bon point. Il faut me croire sur parole pour la position du point da la liste ;)
     else:
-        #On crÈe la nouvelle ligne avec le premier point, milieu du segment formÈ par les premiers points des 2 lignes prÈcÈdentes. Ce point ne sera pas bougÈ afin d'avoir des bords rÈalistes
+        #On cr√©e la nouvelle ligne avec le premier point, milieu du segment form√© par les premiers points des 2 lignes pr√©c√©dentes, pouis le point est boug√©
         ligne_nouv=[(ligne_a[0]+ligne_b[0])/2.0 + Point(0,0,gauss(0,0.25**i))]
-    #On crÈe les variables contenant les positions des points dont on veut obtenir le centre
+    #On cr√©e les variables contenant les positions des points dont on veut obtenir le centre
     pos_a=0
     pos_b=1
     for k in range(pos-1):
-        point1=(ligne_a[pos_a]+ligne_b[pos_b])/2.0
-        point1 = point1 + Point(0,0,gauss(0,0.25**i)) #DÈplace le point verticalement
-        pos_a+=1 #On ajuste la position du point de la premiËre ligne afin d'obtenir le prochain point 
+        point1=(ligne_a[pos_a]+ligne_b[pos_b])/2.0 # Milieu du segment
+        point1 = point1 + Point(0,0,gauss(0,0.25**i)) #D√©place le point verticalement
+        pos_a+=1 #On ajuste la position du point de la premi√®re ligne afin d'obtenir le prochain point 
         point2=(ligne_a[pos_a]+ligne_b[pos_b])/2.0
-        point2 = point2 + Point(0,0,gauss(0,0.25**i)) #DÈplace le point verticalement
-        pos_b+=1 #On ajuste la position du point de la deuxiËme ligne afin d'obtenir le prochain point lors du prochain passage dans la boucle
-        ligne_nouv+=[point1,point2] #On ajoute les 2 points ‡ la ligne
-    if cote_2:
+        point2 = point2 + Point(0,0,gauss(0,0.25**i)) #D√©place le point verticalement
+        pos_b+=1 #On ajuste la position du point de la deuxi√®me ligne afin d'obtenir le prochain point lors du prochain passage dans la boucle
+        ligne_nouv+=[point1,point2] #On ajoute les 2 points √† la ligne
+    if cote_2:#M√™me chose que pour cote_0
         ligne_nouv+=cote_2[(2*pos-1)*(2**(nb_etapes-i-1))]
     else:
-        ligne_nouv+=[(ligne_a[-1]+ligne_b[-1])/2.0 + Point(0,0,gauss(0,0.25**i))]
-    return [ligne_nouv]
+        ligne_nouv+=[(ligne_a[-1]+ligne_b[-1])/2.0 + Point(0,0,gauss(0,0.25**i))]#Ici, on prend le milieu des derniers points des lignes,d'o√π le -1
+    return [ligne_nouv]#On retourne la ligne de point sous forme de liste
 
 
 def modif_triangle(triangle,cotes_deja_faits,nb_etapes):
-    liste=[[triangle[0]],[triangle[1],triangle[2]]] 
-    cote_0=cotes_deja_faits[0]
+    liste=[[triangle[0]],[triangle[1],triangle[2]]] #On cr√©e une liste avec les 3 sommets du triangle. C'est un exemple du format utilis√© : une liste de liste, chaque liste est une liste de points correspondant √† une ligne du triangle
+    cote_0=cotes_deja_faits[0]#On stocke dans le variables les informations pour savoir si les c√¥t√©ss des triangles sont d√©j√† faits ou pas
     cote_1=cotes_deja_faits[1]
     cote_2=cotes_deja_faits[2]
-    if cote_0:
-    	if not cote_0[0]==triangle[0]:
+    if cote_0:#Si ce cot√© a √©t√© d√©ja fait, cote_0 est une liste et la boucle if sera activ√©e.
+    	if not cote_0[0]==triangle[0]:#On v√©rifie que le premier point est bien celui qu'on attend. Si la liste est dans le mauvais sens, on l'inverse
         	cote_0.reverse()
-    if cote_1:	
+    if cote_1:#Idem
 	if not cote_1[0]==triangle[1]:
         	cote_1.reverse()
-    if cote_2:
+    if cote_2:#Idem
     	if not cote_2[0]==triangle[0]:
         	cote_2.reverse()
-    #Le format utilisÈ est le suivant : une liste de listes de points, chaque liste correspondant ‡ une ligne du triangle, donc contenant les points de cette ligne
-    for i in range(nb_etapes):
+    for i in range(nb_etapes):#Correspond aux it√©rations de l'algorithme de base
         liste2=[liste[0]] 
-        #Cette liste contiendra le triangle avec ses nouveaux points. On commence par mettre la premiËre ligne de 1 point, qui ne change jamais
-        #La liste contenant le triangle prÈcÈdant ne sera pas modifiÈe 
-        for pos in range(1,len(liste)-1):#On crÈe toutes les nouvelles lignes, sauf les 2 derniËres
-            #Lors de l'ajout de nouveaux points, il se passe 2 choses : on crÈÈ de nouvelles lignes, et on ajoute des points aux lignes existantes, d'o˘ les 2 procÈdures
+        #Cette liste contiendra le triangle avec ses nouveaux points. On commence par mettre la premi√®re ligne de 1 point, qui ne change jamais
+        #La liste contenant le triangle pr√©c√©dant ne sera pas modifi√©e 
+        for pos in range(1,len(liste)-1):#On cr√©e toutes les nouvelles lignes, sauf les 2 derni√®res
+            #Lors de l'ajout de nouveaux points, il se passe 2 choses : on cr√©√© de nouvelles lignes, et on ajoute des points aux lignes existantes, d'o√π les 2 proc√©dures
             liste2 = liste2 + modif_rang_creation(liste,pos,i,cote_0,cote_2,nb_etapes) + modif_rang_ajout(liste,pos,i)
-        if cote_1:#Si le cote est deja fait, c'est Èquivalent ‡ True, si c'est False, le cotÈ est pas fait et on passe dans le bout else
-            dernier_cote=cote_1[0]
+        if cote_1:#Si ce cot√© a √©t√© d√©ja fait, cote_1 est une liste et la boucle if sera activ√©e. Si il n'a pas √©t√© fait, cote_1 contien False, le la boucle else sera activ√©e
+            dernier_cote=[cote_1[0]]
             for k in range(2**(i+1)):
                 dernier_cote=dernier_cote + [cote_1[k*(2**(nb_etapes-i-1))]]
             dernier_cote=[dernier_cote]
         else:
             dernier_cote = modif_rang_ajout(liste,len(liste)-1,i)
-        liste2= liste2 + modif_rang_creation(liste,len(liste)-1,i,cote_0,cote_2,nb_etapes) + dernier_cote #On fait ‡ part, car les points de la derniËre ligne peuvent ou ne peuvent pas Ítre ajoutÈs alÈatoirement
-        liste=liste2 #La liste principale est modifiÈe, car le nouveau triangle est totalement construit
+        liste2= liste2 + modif_rang_creation(liste,len(liste)-1,i,cote_0,cote_2,nb_etapes) + dernier_cote #On fait √† part, car les points de la derni√®re ligne peuvent ou ne peuvent pas √™tre ajout√©s al√©atoirement
+        liste=liste2 #La liste principale est modifi√©e, car le nouveau triangle est totalement construit
     return liste
 
 
