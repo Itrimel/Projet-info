@@ -167,19 +167,20 @@ def modif_triangle(triangle,cotes_deja_faits,nb_etapes):
     return liste
 
 
-def main(triangles,cotes,nb_etapes):    
-    etat_des_cotes=[False for i in range(len(cotes))]
+def main(triangles,cotes,nb_etapes):
+    ''' Procédure principale qui gère les interactions entre les triangles, et surtout les côtés déjà faits'''
+    etat_des_cotes=[False for i in range(len(cotes))]#Aucun côté n'est fait : la liste ne contient que des False (côté pas fait)
     liste=[]
-    for tri in triangles:
-        cotes_du_tri=[cotes[tri[0]],cotes[tri[1]],cotes[tri[2]]]
-        cotes_deja_faits=[etat_des_cotes[tri[0]],etat_des_cotes[tri[1]],etat_des_cotes[tri[2]]]
-        if cotes_du_tri[1][0]==cotes[tri[0]][0] or cotes_du_tri[1][0]==cotes[tri[0]][1]:
+    for tri in triangles:#Pour chaque triangle
+        cotes_du_tri=[cotes[tri[0]],cotes[tri[1]],cotes[tri[2]]]#La liste des côtés du triangle considéré
+        cotes_deja_faits=[etat_des_cotes[tri[0]],etat_des_cotes[tri[1]],etat_des_cotes[tri[2]]]#La liste de l'état des côtés du triangle : si déjà fait, contient la liste des points du côtés
+        if cotes_du_tri[1][0]==cotes[tri[0]][0] or cotes_du_tri[1][0]==cotes[tri[0]][1]:#On crée le triangle : les 2 premiers sommets sont les 2 points du premier côté, le troisième est le point du deuxième côté qui n'est pas déjà présent dans le premier côté, d'où la condition
             point_3=cotes_du_tri[1][1]
         else:
             point_3=cotes_du_tri[1][0]
-        triangle=[cotes_du_tri[0][0],cotes_du_tri[0][1],point_3]
-        triangle=modif_triangle(triangle,cotes_deja_faits,nb_etapes)       
-        if not cotes_deja_faits[0]:
+        triangle=[cotes_du_tri[0][0],cotes_du_tri[0][1],point_3]#Création du triangle
+        triangle=modif_triangle(triangle,cotes_deja_faits,nb_etapes)#Formation du terrain à partir du triangle      
+        if not cotes_deja_faits[0]:#Stokage des infos sur les côtés faits : si le côté vient d'être fait, la liste des points est stockée dans la liste etat_des_cotes à la bonne position
             cote_0=[]            
             for k in range(len(triangle)):
                 cote_0+=[triangle[k][0]]
@@ -191,8 +192,8 @@ def main(triangles,cotes,nb_etapes):
             etat_des_cotes[tri[2]]=cote_2
         if not cotes_deja_faits[1]:
             etat_des_cotes[tri[1]]=triangle[-1]                
-        liste+=[triangle]
-    creation_image(liste)
+        liste+=[triangle]#On ajoute la liste des points du triangle à la liste global contenant tout
+    creation_image(liste)#On dessine le terrain
 
-def main2():
+def main2():#Procédure test
 	main([(0,1,2),(2,3,4),(4,5,6)],[(Point(0,0,0),Point(1,0,0)),(Point(1,0,0),Point(1,1,0)),(Point(0,0,0),Point(1,1,0)),(Point(1,1,0),Point(0,1,0)),(Point(0,0,0),Point(0,1,0)),(Point(0,0,0),Point(-1,1,0)),(Point(-1,1,0),Point(0,1,0))],5)
