@@ -1,0 +1,44 @@
+# -*- coding: utf-8 -*-
+import Tkinter, tkFileDialog #Module pour que l'utilisateur choisisse l'endroit où enregistrer
+import numpy as np #Module pour l'organisation des coordonnées pour l'affichage
+import os #Module pour rennomer le fichier à la fin
+from mayavi import mlab #Module pour générer le dessin
+def creation_image(liste,save="True",chemin="ask"):
+	'''Créé le dessin, à partir d'une liste de points.
+	La variable save gère si l'image est enregistrée (Par défaut,oui), à l'emplacement "chemin". Par défaut,l'emplacement est demandé à l'utilisateur'''
+	X=[]#Initialisation des 3 listes contenant les coordonnées des sommets des triangles
+	Y=[]
+	Z=[]
+        tri=[]
+	for k in range(1,len(liste)): #Création de la liste des triangles : on s'intéresse ici aux triangles entre la ligne k-1 et k
+		nb_a=(k-1)*k/2 #Position globale du premier point de la ligne k-1
+		nb_b=nb_a+k #Position globale du premier point de la ligne k
+		for i in range(k-1):
+			tri+=[(nb_a,nb_b,nb_b+1),(nb_a,nb_a+1,nb_b+1)] #On ajoute 2 triangles
+			nb_a+=1 #On passe aux points prochains
+			nb_b+=1
+		tri+=[(nb_a,nb_b,nb_b+1)] #On ajoute le dernier triangle
+	for ligne in liste:
+		for point in ligne: #On ajoute les coordonnées des points une à une aux différentes listes
+			X=X+[point.xP]
+			Y=Y+[point.yP]
+			Z=Z+[point.zP]
+	X=np.array(X)#Les listes sont converties en un format reconnu par mlab
+	Y=np.array(Y)
+	Z=np.array(Z)
+	fig=mlab.triangular_mesh(X,Y,Z,tri) #La figure est dessinée
+	if save: #Instructions pour la sauvegarde du fichier
+		if chemin=="ask": #Instructions pour demander à l'utilisateur l'emplacement du fichier
+			root = Tkinter.Tk()
+			root.withdraw()
+			chemin = tkFileDialog.asksaveasfilename(parent=root,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")
+		mlab.savefig(chemin)#Le fichier est enregistré
+		#Bloc pour modifier l'extension du fichier, et faire en sorte de ne pas effacer un autre fichier image. L'extension doit être modifiée, car, pour Blender, les fichiers VRML ont une extension en .wrl
+		nom, ext = os.path.splitext(chemin) #Le nom et l'extension du fichier sont séparés
+		i=0# Le fichier est nommé par défaut image. Pour ne pas effacer d'autres fichiers, on rajoute _i à la fin du nom, où i est un nombre. i est incrémenté jusqu'à ce que l'emplacement soit disponible
+		nom=nom+"_"
+		while os.path.isfile(nom+str(i)+".wrl"):#Instrction testant si le fichier existe, et renvoyant true si c'est le cas
+			i+=1
+		nom=nom+str(i)
+		os.rename(chemin, nom + ".wrl")#Instruction permettant de renommer le fichier "chemin" en nom +".wrl", qui est le même nom, à l'extension et un nombre à la fin près
+		#Fin du bloc
