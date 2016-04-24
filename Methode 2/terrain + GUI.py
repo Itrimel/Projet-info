@@ -70,7 +70,7 @@ def terrain(triangles,cotes,nb_etapes):
     
     def creation_image(liste):
         '''Créé le dessin, à partir d'une liste de points.'''
-	X=[]
+        X=[]
         Y=[]
         Z=[]
         tri=[]
@@ -221,7 +221,7 @@ def process_save():
         texte=Tk.Label(root2,text='La sauvegarde a échoué.\nChemin spécifié non valide',height=2)
         btOk=Tk.Button(root2,text='Ok',command=root2.destroy)
         texte.pack()
-        btOk.Pack()
+        btOk.pack()
         root2.mainloop()
         return None
     mlab.savefig(chemin)#Le fichier est enregistré
