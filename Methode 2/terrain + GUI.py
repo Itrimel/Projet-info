@@ -6,9 +6,6 @@ import numpy as np #Module pour l'organisation des coordonnées pour l'affichage
 import os #Module pour rennomer le fichier à la fin
 from mayavi import mlab #Module pour générer le dessin
 import Tkinter as Tk 
-hauteur=1.0
-decroissance=0.4
-nb_etapes=5
 class Point:
 
     def __init__(self, xP=0, yP=0, zP=0): #valeurs par défaut : (0,0,0)
@@ -98,7 +95,8 @@ def terrain(triangles,cotes,nb_etapes):
     def modif_rang_ajout(liste,pos,i):
         '''Cette procédure permet d'ajouter des points à des lignes déjà existantes'''
         global sigma
-        global decroissance        
+        global decroissanceDV
+        decroissance=decroissanceDV.get()        
         ligne=liste[pos]#On stocke la ligne sur laquelle on travaille    
         ligne2=[ligne[0]]#On crée une nouvelle ligne qui contiendra les modifications : elle contient de base le premier point qui ne bougera pas
         long=len(ligne)
@@ -110,7 +108,8 @@ def terrain(triangles,cotes,nb_etapes):
 
     def modif_rang_creation(liste,pos,i,cote_0,cote_2,nb_etapes):
         global sigma
-        global decroissance
+        global decroissanceDV
+        decroissance=decroissanceDV.get() 
         '''Cette procédure permet de créer une nouvelle ligne de points'''
         ligne_a=liste[pos-1] #On stocke les 2 lignes entre lesquelles sera ajouté la nouvelle ligne
         ligne_b=liste[pos]
@@ -138,7 +137,8 @@ def terrain(triangles,cotes,nb_etapes):
 
 
     def modif_triangle(triangle,cotes_deja_faits,nb_etapes):
-        global hauteur
+        global hauteurDV
+        hauteur=hauteurDV.get()
         global sigma
         aire=aire_tri(triangle[0],triangle[1],triangle[2])
         sigma=aire*hauteur
@@ -206,7 +206,8 @@ def terrain(triangles,cotes,nb_etapes):
 
     
 def process_launch():
-    global nb_etapes
+    global nb_etapesDV
+    nb_etapes=nb_etapesDV.get()
     fig=mlab.figure(1)
     mlab.clf()    
     mlab.draw(terrain([(0,1,2),(2,3,4),(4,5,6)],[(Point(0,0,0),Point(1,0,0)),(Point(1,0,0),Point(1,1,0)),(Point(0,0,0),Point(1,1,0)),(Point(1,1,0),Point(0,1,0)),(Point(0,0,0),Point(0,1,0)),(Point(0,0,0),Point(-1,1,0)),(Point(-1,1,0),Point(0,1,0))],nb_etapes))
@@ -237,33 +238,36 @@ def process_save():
     return None
 
 
-def change_hauteur(ht):
-	global hauteur
-	hauteur = float(ht)
-def change_decroissance(decr):
-	global decroissance
-	decroissance = float(decr)
-def change_etapes(et):
-	global nb_etapes
-	nb_etapes = int(et)
+def kill():
+    global fenetre
+    mlab.close(all=True)
+    fenetre.destroy()
 
 def main():
-    global decroissance
-    global hauteur
-    global nb_etapes    
+    global decroissanceDV
+    global hauteurDV
+    global nb_etapesDV
+    global fenetre    
     fenetre = Tk.Tk()
+    hauteurDV=Tk.DoubleVar()
+    decroissanceDV=Tk.DoubleVar()
+    nb_etapesDV=Tk.IntVar()
     btSave=Tk.Button(fenetre,text='Save',command=process_save)
-    btDecr=Tk.Scale(fenetre,orient="horizontal",from_=0.0,to=1.0,label="Decroissance",resolution=-1,command=change_decroissance)
-    btHt=Tk.Scale(fenetre,orient="horizontal",length=200,from_=0.0,to=5.0,label="Hauteur",resolution=-1,command=change_hauteur)
-    btEtapes=Tk.Scale(fenetre,orient="horizontal",from_=1,to=8,label="Etapes",resolution=1,command=change_etapes)
+    btDecr=Tk.Scale(fenetre,orient="horizontal",from_=0.0,to=1.0,label="Decroissance",resolution=-1,variable=decroissanceDV)
+    btHt=Tk.Scale(fenetre,orient="horizontal",length=200,from_=0.0,to=5.0,label="Hauteur",resolution=-1,variable=hauteurDV)
+    btEtapes=Tk.Scale(fenetre,orient="horizontal",from_=1,to=8,label="Etapes",resolution=1,variable=nb_etapesDV)
     btLaunch=Tk.Button(fenetre,text="Launch",command=process_launch)
-    btQuit=Tk.Button(fenetre,text="Quitter",command=fenetre.destroy)
+    btQuit=Tk.Button(fenetre,text="Quitter",command=kill)
     btHt.pack()
     btDecr.pack()
     btEtapes.pack()
     btLaunch.pack()
     btSave.pack()
     btQuit.pack()
+    btDecr.set(0.4)
+    btHt.set(2.5)
+    btEtapes.set(6)
+    fig=mlab.figure(1)
     fenetre.mainloop()
 
 
