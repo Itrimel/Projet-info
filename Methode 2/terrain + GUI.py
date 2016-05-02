@@ -163,25 +163,25 @@ def terrain(triangles,cotes,nb_etapes):
         for i in range(nb_etapes):#Correspond aux itérations de l'algorithme de base
             liste2=[liste[0]] 
             #Cette liste contiendra le triangle avec ses nouveaux points. On commence par mettre la première ligne de 1 point, qui ne change jamais
-            #La liste contenant le triangle précédant ne sera pas modifiée 
+            #La liste contenant le triangle précédant ne sera pas modifiée et sera utilisée comme référence durant toute ce passage dans la boucle
             for pos in range(1,len(liste)-1):#On crée toutes les nouvelles lignes, sauf les 2 dernières
                 #Lors de l'ajout de nouveaux points, il se passe 2 choses : on créé de nouvelles lignes, et on ajoute des points aux lignes existantes, d'où les 2 procédures
                 liste2 = liste2 + modif_rang_creation(liste,pos,i,cote_0,cote_2,nb_etapes) + modif_rang_ajout(liste,pos,i)
-            if cote_1:#Si le cote est deja fait, c'est équivalent à True, si c'est False, le coté est pas fait et on passe dans le bout else
+            if cote_1:#Si le cote est deja fait, c'est équivalent à True, si c'est False, le coté est pas fait et on passe dans la partie else
                 dernier_cote=[cote_1[0]]
                 for k in range(2**(i+1)):#On récupère tout les points dont on a besoin pour le dernier coté
                     dernier_cote=dernier_cote + [cote_1[k*(2**(nb_etapes-i-1))]]
                 dernier_cote=[dernier_cote]
             else:
-                dernier_cote = modif_rang_ajout(liste,len(liste)-1,i)
+                dernier_cote = modif_rang_ajout(liste,len(liste)-1,i)#On utilise la même procédure que pour étendre les autres lignes
             liste2= liste2 + modif_rang_creation(liste,len(liste)-1,i,cote_0,cote_2,nb_etapes) + dernier_cote #On fait à part, car les points de la dernière ligne peuvent ou ne peuvent pas être ajoutés aléatoirement
             liste=liste2 #La liste principale est modifiée, car le nouveau triangle est totalement construit
         return liste
 
 
  
-    etat_des_cotes=[False for i in range(len(cotes))]
-    liste=[]
+    etat_des_cotes=[False for i in range(len(cotes))] #On crée la liste contenant l'état des cotés. De base, les cotés ne sont pas faits, d'où le False
+    liste=[]#Liste qui contiendra tout les triangles après passage dans l'algorithme
     for tri in triangles:#Pour chaque triangle
         cotes_du_tri=[cotes[tri[0]],cotes[tri[1]],cotes[tri[2]]]#La liste des cotés du triangle considéré
         cotes_deja_faits=[etat_des_cotes[tri[0]],etat_des_cotes[tri[1]],etat_des_cotes[tri[2]]]#La liste de l'état des cotés. Si ils sont faits, il y a la liste des points du coté. Sinon, il y a False
@@ -193,17 +193,17 @@ def terrain(triangles,cotes,nb_etapes):
         triangle=modif_triangle(triangle,cotes_deja_faits,nb_etapes)#Formation du terrain à partir du triangle
         if not cotes_deja_faits[0]:#Stokage des infos sur les côtés faits : si le côté vient d'être fait, la liste des points est stockée dans la liste etat_des_cotes à la bonne position
             cote_0=[]            
-            for k in range(len(triangle)):
+            for k in range(len(triangle)):#On récupère tout les points, qui sont les premiers points de chaque ligne du triangle
                 cote_0+=[triangle[k][0]]
             etat_des_cotes[tri[0]]=cote_0
-        if not cotes_deja_faits[2]:
+        if not cotes_deja_faits[2]:#Pareil
             cote_2=[]            
-            for k in range(len(triangle)):
+            for k in range(len(triangle)):#Ici, ce sont les derniers points de chaque ligne du triangle
                 cote_2+=[triangle[k][-1]]
             etat_des_cotes[tri[2]]=cote_2
-        if not cotes_deja_faits[1]:
-            etat_des_cotes[tri[1]]=triangle[-1]                
-        liste+=[triangle]#On ajoute la liste des points du triangle à la liste global contenant tout
+        if not cotes_deja_faits[1]:#Pareil
+            etat_des_cotes[tri[1]]=triangle[-1]#Ici, c'est la dernière ligne du triangle          
+        liste+=[triangle]#On ajoute la liste des points du triangle à la liste globale contenant tout
     return creation_image(liste)#On retourne le dessin
 
     
@@ -218,11 +218,10 @@ def process_launch():
 def process_save():
     '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image'''
     fig=mlab.figure(1)#Focus sur la bonne fenêtre
-    root = Tk.Tk()#Création de la fenêtre pour demander l'emplacement de la sauvegarde
-    root.withdraw()
+    root = Tk.Toplevel()#Création de la fenêtre pour demander l'emplacement de la sauvegarde
     chemin = tkFileDialog.asksaveasfilename(parent=root,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")
-    if chemin=='':#Petite sécurité pour moins d'erreur
-        root2=Tk.Tk()
+    if chemin=='':#Petite sécurité pour moins d'erreur. Si,lors de l'instruction précédente, l'utilisateur a appuyé sur annuler, la chemin retourné est vide. On signale donc que le programme ne va pas sauvegarder
+        root2=Tk.Toplevel()
         texte=Tk.Label(root2,text='La sauvegarde a échoué.\nChemin spécifié non valide',height=2)
         btOk=Tk.Button(root2,text='Ok',command=root2.destroy)#Affichage d'une fenêtre pour signifier l'échec
         texte.pack()
