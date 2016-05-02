@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Nécessite un environnement comprenant : Python 2.7; la librairie mayavi et toutes ses dépendances; la librairie wx; la librairie sympy'''
+#Nécessite un environnement comprenant : Python 2.7, la librairie mayavi et toutes ses dépendances, la librairie wx, la librairie sympy
 from sympy import N #Pour les arrondis dans la classe Point
 from random import gauss #Pour les déplacements aléatoires
 import tkFileDialog #Module pour que l'utilisateur choisisse l'endroit où enregistrer
