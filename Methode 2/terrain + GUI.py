@@ -218,8 +218,8 @@ def process_launch():
 def process_save():
     '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image'''
     fig=mlab.figure(1)#Focus sur la bonne fenêtre
-    root = Tk.Toplevel()#Création de la fenêtre pour demander l'emplacement de la sauvegarde
-    chemin = tkFileDialog.asksaveasfilename(parent=root,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")
+    global fenetre
+    chemin = tkFileDialog.asksaveasfilename(parent=fenetre,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")
     if chemin=='':#Petite sécurité pour moins d'erreur. Si,lors de l'instruction précédente, l'utilisateur a appuyé sur annuler, la chemin retourné est vide. On signale donc que le programme ne va pas sauvegarder
         root2=Tk.Toplevel()
         texte=Tk.Label(root2,text='La sauvegarde a échoué.\nChemin spécifié non valide',height=2)
