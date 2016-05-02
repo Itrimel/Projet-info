@@ -1,9 +1,10 @@
 ﻿# -*- coding: utf-8 -*-
-from sympy import N #Pour les arrondis
+﻿#Nécessite un environnement comprenant : Python 2.7; la librairie mayavi et toutes ses dépendances; la librairie wx; la librairie sympy
+from sympy import N #Pour les arrondis dans la classe Point
 from random import gauss #Pour les déplacements aléatoires
 import tkFileDialog #Module pour que l'utilisateur choisisse l'endroit où enregistrer
-import numpy as np #Module pour l'organisation des coordonnées pour l'affichage
-import os #Module pour rennomer le fichier à la fin
+import numpy as np #Module pour l'organisation des coordonnées lors de la phase de génération de l'image par mayavi
+import os #Module pour rennomer le fichier image créé
 from mayavi import mlab #Module pour générer le dessin
 import Tkinter as Tk #Pour les fenêtres graphiques
 
@@ -45,8 +46,8 @@ class Point: #Fonctionne comme un vecteur
     def __str__(self): #affichage
         return(str((self.xP,self.yP,self.zP)))
         
-    def __eq__(self,andP): #teste si 2 points/vecteurs sont égaux à 10^-7
-        if N(self.xP,7)==N(andP.xP,7) and N(self.yP,7)==N(andP.yP,7) and N(self.zP,7)==N(andP.zP,7):
+    def __eq__(self,other): #teste si 2 points/vecteurs sont égaux à 10^-7 près
+        if N(self.xP,7)==N(other.xP,7) and N(self.yP,7)==N(other.yP,7) and N(self.zP,7)==N(other.zP,7):
             return True
         else:
             return False
@@ -65,7 +66,7 @@ def terrain(triangles,cotes,nb_etapes):
         b=B.dist(C)
         c=C.dist(A)
         s=(a+b+c)/2
-        Aire=(s*(s-a)*(s-b)*(s-c))**0.5 #La formule magique !
+        Aire=(s*(s-a)*(s-b)*(s-c))**0.5 #La formule magique ! Pour être précis, la formule de Héron
         return(Aire)
     
     def creation_image(liste):
@@ -79,49 +80,47 @@ def terrain(triangles,cotes,nb_etapes):
             for k in range(1,len(triangle)): #Création de la liste des triangles : on s'intéresse ici aux triangles entre la ligne k-1 et k
                 nb_a=(k-1)*k/2 #Position globale du premier point de la ligne k-1
                 nb_b=nb_a+k #Position globale du premier point de la ligne k
-                for i in range(k-1):
+                for i in range(k-1):#Pour chaque point de la ligne k-1 considérée, sauf le dernier
                     tri+=[(pos+nb_a,pos+nb_b,pos+nb_b+1),(pos+nb_a,pos+nb_a+1,pos+nb_b+1)] #On ajoute 2 triangles
                     nb_a+=1 #On passe aux points prochains
                     nb_b+=1
                 tri+=[(pos+nb_a,pos+nb_b,pos+nb_b+1)] #On ajoute le dernier triangle
             for ligne in triangle:
                 for point in ligne: #On ajoute les coordonnées des points une à une aux différentes listes
-                    pos+=1#On ajoute 1 à la pos, afin que les nouveaux triangles crées correspondent bien aux bons points
+                    pos+=1#On ajoute 1 à la pos, afin que les nouveaux triangles crées lors du prochain passage dans la boucle for correspondent bien aux bons points
                     X=X+[point.xP]
                     Y=Y+[point.yP]
                     Z=Z+[point.zP]
-        X=np.array(X)#Les listes sont converties en un format reconnu par mlab
+        X=np.array(X)#Les listes sont converties en un format reconnu par mayavi
         Y=np.array(Y)
         Z=np.array(Z)
-        return mlab.triangular_mesh(X,Y,Z,tri,colormap="gist_earth") #La figure est dessinée
+        return mlab.triangular_mesh(X,Y,Z,tri,colormap="gist_earth") #La figure est dessinée, avec des couleurs correspondant à un terrain
 
     def modif_rang_ajout(liste,pos,i):
-        '''Cette procédure permet d'ajouter des points à des lignes déjà existantes'''
+        '''Cette procédure permet d'ajouter des points à des lignes de triangle déjà existantes'''
         global sigma #On récupère la valeur de sigma
         global decroissanceDV
         decroissance=decroissanceDV.get()#On récupère la valeur de decroissance    
         ligne=liste[pos]#On stocke la ligne sur laquelle on travaille    
         ligne2=[ligne[0]]#On crée une nouvelle ligne qui contiendra les modifications : elle contient de base le premier point qui ne bougera pas
-        long=len(ligne)
-        for k in range(long-1):
-            point=(ligne[k]+ligne[k+1])/2.0 #Les points à ajouter sont les milieux des segments
-            point = point + Point(0,0,gauss(0,sigma*decroissance**(i+1))) #Déplace le point verticalement
-            ligne2=ligne2+[point,ligne[k+1]]#On ajoute un point crée, puis un point existant, qui ne bouge pas
-        return [ligne2]
+        for k in range(len(ligne)-1):#On a len-1 segments sur la ligne, donc len-1 points à ajouter
+            point=(ligne[k]+ligne[k+1])/2.0 #Les points à ajouter sont les milieux des segments déjà existants
+            point = point + Point(0,0,gauss(0,sigma*decroissance**(i+1))) #Déplace le point verticalement, selon des paramètres choisis
+            ligne2=ligne2+[point,ligne[k+1]]#On ajoute le point crée, puis le point existant suivant, qui ne bouge pas
+        return [ligne2] #On retourne la nouvelle ligne comprenant les points existants et les points crées
 
-    def modif_rang_creation(liste,pos,i,cote_0,cote_2,nb_etapes):
+    def modif_rang_creation(liste,pos,i,cote_0,cote_2,numero_etape_actuelle):
         '''Cette procédure permet de créer une nouvelle ligne de points'''
         global sigma #On récupère la valeur de sigma
         global decroissanceDV
         decroissance=decroissanceDV.get() #On récupère la valeur de decroissance 
         ligne_a=liste[pos-1] #On stocke les 2 lignes entre lesquelles sera ajouté la nouvelle ligne
         ligne_b=liste[pos]
-        if cote_0:#Si ce coté a été déja fait, cote_0 est une liste et la boucle if sera activée. Si il n'a pas été fait, cote_0 contien False, le la boucle else sera activée
-            ligne_nouv=[cote_0[(2*pos-1)*(2**(nb_etapes-i-1))]] #On crée la nouvelle ligne avec le bon point. Il faut me croire sur parole pour la position du point da la liste ;)
-        else:
-            #On crée la nouvelle ligne avec le premier point, milieu du segment formé par les premiers points des 2 lignes précédentes. Ce point ne sera pas bougé afin d'avoir des bords réalistes
+        if cote_0:#Si ce coté a été déja fait, cote_0 est une liste et l'içnstruction conditionelle if sera activée. Si il n'a pas été fait, cote_0 contien False, l'instruction conditionelle else sera activée
+            ligne_nouv=[cote_0[(2*pos-1)*(2**(numero_etape_actuelle-i-1))]] #On crée la nouvelle ligne avec le bon premier point. Il faut me croire pour la position du point dans la liste 
+        else: #On crée la nouvelle ligne avec le premier point, milieu du segment formé par les premiers points des 2 lignes précédentes.
             ligne_nouv=[(ligne_a[0]+ligne_b[0])/2.0 + Point(0,0,gauss(0,sigma*decroissance**(i+1)))]
-        #On crée les variables contenant les positions des points dont on veut obtenir le centre
+        #On crée les variables contenant les positions des points dont on veut obtenir le milieu du segment
         pos_a=0
         pos_b=1
         for k in range(pos-1):
@@ -133,24 +132,26 @@ def terrain(triangles,cotes,nb_etapes):
             pos_b+=1 #On ajuste la position du point de la deuxième ligne afin d'obtenir le prochain point lors du prochain passage dans la boucle
             ligne_nouv+=[point1,point2] #On ajoute les 2 points à la ligne
         if cote_2:# Même chose que pour cote_0
-            ligne_nouv+=cote_2[(2*pos-1)*(2**(nb_etapes-i-1))]
+            ligne_nouv+=cote_2[(2*pos-1)*(2**(numero_etape_actuelle-i-1))]
         else:
             ligne_nouv+=[(ligne_a[-1]+ligne_b[-1])/2.0 + Point(0,0,gauss(0,sigma*decroissance**(i+1)))]#Ici, on prend le milieu des derniers points des lignes,d'où le -1
-        return [ligne_nouv]
+        return [ligne_nouv] #On retourne la nouvelle ligne formée
 
 
     def modif_triangle(triangle,cotes_deja_faits,nb_etapes):
+        '''Procédure gérant la génération de terrain à l'échelle d'un triangle initial '''
         global hauteurDV
         hauteur=hauteurDV.get() #On récupère la hauteur
         global sigma # On déclare sigma variable globale
         aire=aire_tri(triangle[0],triangle[1],triangle[2])#On calcule l'aire du triangle
         sigma=aire*hauteur# On attribue à sigma une valeur proportionnelle à l'aire du triangle, afin de moduler les variations de hauteur en fonction de la taille du triangle
-        liste=[[triangle[0]],[triangle[1],triangle[2]]] #On crée une liste avec les 3 sommets du triangle. C'est un exemple du format utilisé : une liste de liste, chaque liste est une liste de points correspondant à une ligne du triangle
+        liste=[[triangle[0]],[triangle[1],triangle[2]]] #On crée une liste avec les 3 sommets du triangle. C'est un exemple du format utilisé : une liste de liste, chaqu'une de ces listes contient des points correspondant à une ligne de points du triangle
         cote_0=cotes_deja_faits[0]#On stocke dans le variables les informations pour savoir si les côtéss des triangles sont déjà faits ou pas
         cote_1=cotes_deja_faits[1]
         cote_2=cotes_deja_faits[2]
-        if cote_0:#Si ce coté a été déja fait, cote_0 est une liste et la boucle if sera activée.
-            if not cote_0[0]==triangle[0]:#On vérifie que le premier point est bien celui qu'on attend. Si la liste est dans le mauvais sens, on l'inverse
+        if cote_0:#Si ce coté a été déja fait, cote_0 est une liste et l'instruction conditionelle if sera activée.
+            if not cote_0[0]==triangle[0]:#On vérifie que le premier point est bien celui qu'on attend. Si la liste est dans le mauvais sens, on l'inverse.
+                                          #On sépare les 2 conditions, car si cote_0 contient False, la deuxième condition retourne une erreur, et stoppe le déroulement du programme
                 cote_0.reverse()
         if cote_1:#Idem
             if not cote_1[0]==triangle[1]:
