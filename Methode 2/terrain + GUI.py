@@ -209,8 +209,8 @@ def terrain(triangles,cotes,nb_etapes):
     
 def process_launch():
     '''Procédure reliant une fenetre graphique et le coeur du programme'''
-    global nb_etapesDV
-    nb_etapes=nb_etapesDV.get()#On récupère le nombre d'étapes
+    global nb_etapesIV
+    nb_etapes=nb_etapesIV.get()#On récupère le nombre d'étapes
     fig=mlab.figure(1)
     mlab.clf()#La fenêtre de dessin est initialisée
     mlab.draw(terrain([(0,1,2),(2,3,4),(4,5,6)],[(Point(0,0,0),Point(1,0,0)),(Point(1,0,0),Point(1,1,0)),(Point(0,0,0),Point(1,1,0)),(Point(1,1,0),Point(0,1,0)),(Point(0,0,0),Point(0,1,0)),(Point(0,0,0),Point(-1,1,0)),(Point(-1,1,0),Point(0,1,0))],nb_etapes))#On affiche le dessin
@@ -251,13 +251,13 @@ def main():
     '''Procédure principale créant une fenêtre graphique'''
     global decroissanceDV #Déclaration des variables globales réutilisées ailleurs
     global hauteurDV
-    global nb_etapesDV
+    global nb_etapesIV
     global fenetre    
     fenetre = Tk.Tk()
     #Déclaration des variables, de telle sorte qu'elles puissent être utilisées par les boutons/widgets de Tkinter
     hauteurDV=Tk.DoubleVar()#équivalent à un nombre àvirgule flottante
     decroissanceDV=Tk.DoubleVar()
-    nb_etapesDV=Tk.IntVar()#équivalent à un nombre entier
+    nb_etapesIV=Tk.IntVar()#équivalent à un nombre entier
     btSave=Tk.Button(fenetre,text='Save',command=process_save)#Bouton permettant de lancer process_save(), qui sauvegarde l'image
     btDecr=Tk.Scale(fenetre,orient="horizontal",from_=0.0,to=1.0,label="Decroissance",resolution=-1,variable=decroissanceDV)# Widget permettant de choisir une valeur pour decroissanceDV
     btHt=Tk.Scale(fenetre,orient="horizontal",length=200,from_=0.0,to=5.0,label="Hauteur",resolution=-1,variable=hauteurDV)# Widget permettant de choisir une valeur pour hauteurDV
