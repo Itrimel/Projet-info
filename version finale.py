@@ -64,22 +64,26 @@ class Triangle:
         self.point3=C
 
 class FrameM1:
-    def __init__(self,parent):
-        self.frame=Tk.Frame(parent)
+    def __init__(self,parent,frame):
+        self.frame=frame
         self.parent=parent
         self.decr_espeDV=Tk.DoubleVar()
         self.espeDV=Tk.DoubleVar()
         self.decr_sigmaDV=Tk.DoubleVar()
         self.sigmaDV=Tk.DoubleVar()
         self.nb_etapesIV=Tk.IntVar()
-        Tk.Scale(self.frame,orient="horizontal",length=200,from_=0.0,to=5.0,label="Esperance",resolution=-1,variable=self.espeDV).pack()# Widget permettant de choisir une valeur pour espeDV
-        Tk.Scale(self.frame,orient="horizontal",from_=0.0,to=1.0,label="Decroissance espe",resolution=-1,variable=self.decr_espeDV).pack()# Widget permettant de choisir une valeur pour decr_espeDV
-        Tk.Scale(self.frame,orient="horizontal",length=100,from_=0.0,to=2.5,label="Sigma",resolution=-1,variable=self.sigmaDV).pack()# Widget permettant de choisir une valeur pour sigmaDV
-        Tk.Scale(self.frame,orient="horizontal",from_=0.0,to=1.0,label="Decroissance sigma",resolution=-1,variable=self.decr_sigmaDV).pack()# Widget permettant de choisir une valeur pour decr_sigmaDV
-        Tk.Scale(self.frame,orient="horizontal",from_=1,to=8,label="Etapes",resolution=1,variable=self.nb_etapesIV).pack()# Widget permettant de choisir une valeur pour nb_etapesDV. La résolution est de 1, pour avoir des valeurs entières
-        Tk.Button(self.frame,text="Launch",command=self.montagne).pack()#Bouton lancant process_launch(), qui permet la création d'un dessin
-        Tk.Button(self.frame,text='Save',command=self.process_save).pack()
-        Tk.Button(self.frame,text="Quitter",command=parent.destroy).pack()#Bouton permettant de fermer les fenêtres
+        for i in range(6):
+            self.frame.columnconfigure(i,minsize=53)
+        for i in range(4):
+            self.frame.rowconfigure(i,minsize=50)
+        Tk.Scale(self.frame,orient="horizontal",length=150,from_=0.0,to=2.5,label="Esperance",resolution=-1,variable=self.espeDV).grid(row=0,column=0,columnspan=3)# Widget permettant de choisir une valeur pour espeDV
+        Tk.Scale(self.frame,orient="horizontal",from_=0.0,to=1.0,label="Decroissance espe",resolution=-1,variable=self.decr_espeDV).grid(row=1,column=0,columnspan=3)# Widget permettant de choisir une valeur pour decr_espeDV
+        Tk.Scale(self.frame,orient="horizontal",length=100,from_=0.0,to=2.5,label="Sigma",resolution=-1,variable=self.sigmaDV).grid(row=0,column=3,columnspan=3)# Widget permettant de choisir une valeur pour sigmaDV
+        Tk.Scale(self.frame,orient="horizontal",from_=0.0,to=1.0,label="Decroissance sigma",resolution=-1,variable=self.decr_sigmaDV).grid(row=1,column=3,columnspan=3)# Widget permettant de choisir une valeur pour decr_sigmaDV
+        Tk.Scale(self.frame,orient="horizontal",from_=1,to=8,label="Etapes",resolution=1,variable=self.nb_etapesIV).grid(row=2,column=0,columnspan=6)# Widget permettant de choisir une valeur pour nb_etapesDV. La résolution est de 1, pour avoir des valeurs entières
+        Tk.Button(self.frame,text="Launch",command=self.montagne,width=8).grid(row=3,column=0,columnspan=2)#Bouton lancant process_launch(), qui permet la création d'un dessin
+        Tk.Button(self.frame,text='Save',command=self.process_save,width=8).grid(row=3,column=2,columnspan=2)
+        #Tk.Button(self.frame,text="Quitter",command=parent.destroy).pack()#Bouton permettant de fermer les fenêtres
         self.espeDV.set(1)
         self.decr_espeDV.set(0.2)
         self.sigmaDV.set(0.5)
@@ -183,8 +187,8 @@ class FrameM1:
         mlab.draw(creation_image(liste))
 
 class FrameM2:
-    def __init__(self,parent):
-        self.frame=Tk.Frame(parent)
+    def __init__(self,parent,frame):
+        self.frame=frame
         self.parent=parent
         #Déclaration des variables, de telle sorte qu'elles puissent être utilisées par les boutons/widgets de Tkinter
         self.hauteurDV=Tk.DoubleVar()#équivalent à un nombre àvirgule flottante
@@ -192,21 +196,28 @@ class FrameM2:
         self.nb_etapesIV=Tk.IntVar()#équivalent à un nombre entier
         self.generateurSV=Tk.StringVar()
         self.generateur=1
-        btSave=Tk.Button(self.frame,text='Save',command=self.process_save)#Bouton permettant de lancer process_save(), qui sauvegarde l'image
+        for i in range(3):
+            self.frame.rowconfigure(i,minsize=80)
+        for i in range(3):
+            self.frame.columnconfigure(i,minsize=80)
+        self.frame_org=Tk.Frame(self.frame)
+        for i in range(3):
+            self.frame_org.columnconfigure(i,minsize=107)
+        btSave=Tk.Button(self.frame_org,text='Save',command=self.process_save,width=8)#Bouton permettant de lancer process_save(), qui sauvegarde l'image
         btDecr=Tk.Scale(self.frame,orient="horizontal",from_=0.0,to=1.0,label="Decroissance",resolution=-1,variable=self.decroissanceDV)# Widget permettant de choisir une valeur pour decroissanceDV
-        btHt=Tk.Scale(self.frame,orient="horizontal",length=200,from_=0.0,to=5.0,label="Hauteur",resolution=-1,variable=self.hauteurDV)# Widget permettant de choisir une valeur pour hauteurDV
+        btHt=Tk.Scale(self.frame,orient="horizontal",length=150,from_=0.0,to=5.0,label="Hauteur",resolution=-1,variable=self.hauteurDV)# Widget permettant de choisir une valeur pour hauteurDV
         btEtapes=Tk.Scale(self.frame,orient="horizontal",from_=1,to=8,label="Etapes",resolution=1,variable=self.nb_etapesIV)# Widget permettant de choisir une valeur pour nb_etapesDV. La résolution est de 1, pour avoir des valeurs entières
-        btLaunch=Tk.Button(self.frame,text="Launch",command=self.process_launch)#Bouton lancant process_launch(), qui permet la création d'un dessin
-        btQuit=Tk.Button(self.frame,text="Quitter",command=parent.destroy)#Bouton permettant de fermer les fenêtres
-        btGen=Tk.Button(self.frame,command=self.change_gen,textvariable=self.generateurSV)
-        #On affiche tous, sans organisation particulière, grace à pack(), qui ajoute le nouveau widget/bouton en dessous des autres
-        btHt.pack()
-        btDecr.pack()
-        btEtapes.pack()
-        btGen.pack()
-        btLaunch.pack()
-        btSave.pack()
-        btQuit.pack()
+        btLaunch=Tk.Button(self.frame_org,text="Launch",command=self.process_launch,width=8)#Bouton lancant process_launch(), qui permet la création d'un dessin
+        btGen=Tk.Button(self.frame,command=self.change_gen,textvariable=self.generateurSV,width=8)
+        #On affiche tous, sans organisation particulière, grace à grid(), qui permet d'organiser
+        self.frame_org.grid(column=0,columnspan=6,row=2)
+        btHt.grid(column=0,row=0)
+        Tk.Label(self.frame,anchor='e',text='Generateur').grid(column=1,row=0,sticky='e')
+        btDecr.grid(column=0,row=1)
+        btEtapes.grid(column=1,row=1,columnspan=2)
+        btGen.grid(column=2,row=0)
+        btLaunch.grid(column=0,row=0)
+        btSave.grid(column=1,row=0)
         #On change les valeurs, afin qu'elles soient plus proche des valeurs intéressantes
         btDecr.set(0.4)
         btHt.set(2.5)
@@ -409,19 +420,25 @@ class FrameM2:
 def main():
     '''Procédure principale créant une fenêtre graphique'''
     root=Tk.Tk()
-    frameM1=FrameM1(root)
-    frameM1.frame.grid(row=0, column=0, sticky='news')   
-    frameM2=FrameM2(root)
-    frameM2.frame.grid(row=0, column=0, sticky='news')
+    frameM1=Tk.Frame(root)
+    frameM2=Tk.Frame(root)
     frameP=Tk.Frame(root)
+    frameM1.grid(row=0, column=0, sticky='news')
+    frameM2.grid(row=0, column=0, sticky='news')
     frameP.grid(row=0, column=0, sticky='news')
-    Tk.Button(frameM2.frame,text='Retour',command=frameP.tkraise).pack()
-    Tk.Button(frameM1.frame,text='Retour',command=frameP.tkraise).pack()
-    Tk.Button(frameP,text='Methode 1',command=frameM1.frame.tkraise).pack()
-    Tk.Button(frameP,text='Methode 2',command=frameM2.frame.tkraise).pack()
-    Tk.Button(frameP,text="Quitter",command=root.destroy).pack()
+    frameM1=FrameM1(root,frameM1)
+    frameM2=FrameM2(root,frameM2)
+    for i in range(6):
+        frameP.rowconfigure(i,minsize=40)
+    for i in range(4):
+        frameP.columnconfigure(i,minsize=80)
+    Tk.Button(frameM2.frame_org,text='Retour',command=frameP.tkraise,width=8).grid(column=2,row=0)
+    Tk.Button(frameM1.frame,text='Retour',command=frameP.tkraise,width=8).grid(row=3,column=4,columnspan=2)
+    Tk.Button(frameP,text='Methode 1',command=frameM1.frame.tkraise,width=12).grid(column=0,columnspan=2,row=0,rowspan=5)
+    Tk.Button(frameP,text='Methode 2',command=frameM2.frame.tkraise,width=12).grid(column=2,columnspan=2,row=0,rowspan=5)
+    Tk.Button(frameP,text="Quitter",command=root.destroy,width=8).grid(column=0,columnspan=4,row=5,sticky='se',pady=10,padx=10)
     fig=mlab.figure(1)#On affiche la fenêtre mayavi, afin que l'utilisateur puisse la bouger
-    root.mainloop()
+    #root.mainloop()
 main()
 
 
