@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #Nécessite un environnement comprenant : Python 2.7, la librairie mayavi et toutes ses dépendances, la librairie wx, la librairie sympy
+#Pour créer un environnement virtuel à l'aide d'Anaconda contenant ces librairies, voir ce lien : http://conda.pydata.org/docs/using/envs.html
 from sympy import N #Pour les arrondis dans la classe Point
 from random import gauss,expovariate,random #Pour les déplacements aléatoires
 import tkFileDialog #Module pour que l'utilisateur choisisse l'endroit où enregistrer
@@ -57,33 +58,36 @@ class Point: #Fonctionne comme un vecteur
     def dist(self,other): #distance d'un point à un autre
         return ((self.xP - other.xP)**2+(self.yP - other.yP)**2+(self.zP-other.zP)**2)**0.5
     
-class Triangle:
+class Triangle:#Classe permettant de contenir les infos définissant un triangle
     def __init__(self, A=Point(0,0,0), B=Point(1,1,0), C=Point(2,-1,0)):
         self.point1=A
         self.point2=B
         self.point3=C
 
-class FrameM1:
-    def __init__(self,parent,frame):
-        self.frame=frame
+class Methode1:#Classe contenant tout ce qui est en rappport avec la méthode 1 : cadre graphique, méthodes
+    def __init__(self,parent):#On initialise le cadre graphique
+        self.frame=Tk.Frame(parent)#création du cadre, qui sera présent dans la fenêtre parent
         self.parent=parent
+        #Création des variables qui pourront être modifiée par l'utilisateur
         self.decr_espeDV=Tk.DoubleVar()
         self.espeDV=Tk.DoubleVar()
         self.decr_sigmaDV=Tk.DoubleVar()
         self.sigmaDV=Tk.DoubleVar()
         self.nb_etapesIV=Tk.IntVar()
+        #Paramétrages de l'organisation du cadre, pour que le rendu soit a peu près agréable
         for i in range(6):
             self.frame.columnconfigure(i,minsize=53)
         for i in range(4):
             self.frame.rowconfigure(i,minsize=50)
+        #Positionnement de tous les widgets dans le cadre
         Tk.Scale(self.frame,orient="horizontal",length=150,from_=0.0,to=2.5,label="Esperance",resolution=-1,variable=self.espeDV).grid(row=0,column=0,columnspan=3)# Widget permettant de choisir une valeur pour espeDV
         Tk.Scale(self.frame,orient="horizontal",from_=0.0,to=1.0,label="Decroissance espe",resolution=-1,variable=self.decr_espeDV).grid(row=1,column=0,columnspan=3)# Widget permettant de choisir une valeur pour decr_espeDV
         Tk.Scale(self.frame,orient="horizontal",length=100,from_=0.0,to=2.5,label="Sigma",resolution=-1,variable=self.sigmaDV).grid(row=0,column=3,columnspan=3)# Widget permettant de choisir une valeur pour sigmaDV
         Tk.Scale(self.frame,orient="horizontal",from_=0.0,to=1.0,label="Decroissance sigma",resolution=-1,variable=self.decr_sigmaDV).grid(row=1,column=3,columnspan=3)# Widget permettant de choisir une valeur pour decr_sigmaDV
-        Tk.Scale(self.frame,orient="horizontal",from_=1,to=8,label="Etapes",resolution=1,variable=self.nb_etapesIV).grid(row=2,column=0,columnspan=6)# Widget permettant de choisir une valeur pour nb_etapesDV. La résolution est de 1, pour avoir des valeurs entières
-        Tk.Button(self.frame,text="Launch",command=self.montagne,width=8).grid(row=3,column=0,columnspan=2)#Bouton lancant process_launch(), qui permet la création d'un dessin
-        Tk.Button(self.frame,text='Save',command=self.process_save,width=8).grid(row=3,column=2,columnspan=2)
-        #Tk.Button(self.frame,text="Quitter",command=parent.destroy).pack()#Bouton permettant de fermer les fenêtres
+        Tk.Scale(self.frame,orient="horizontal",from_=1,to=8,label="Etapes",resolution=1,variable=self.nb_etapesIV).grid(row=2,column=0,columnspan=6)# Widget permettant de choisir une valeur pour nb_etapesIV. La résolution est de 1, pour avoir des valeurs entières
+        Tk.Button(self.frame,text="Launch",command=self.montagne,width=8).grid(row=3,column=0,columnspan=2)#Bouton lancant montagne(), qui permet la création d'un dessin
+        Tk.Button(self.frame,text='Save',command=self.process_save,width=8).grid(row=3,column=2,columnspan=2)#Bouton permettant de lancer process_save(), qui va sauvegarder l'image en un format 3d
+        #On initialise les variables aux valeurs donnant des résultats les plus intéressants
         self.espeDV.set(1)
         self.decr_espeDV.set(0.2)
         self.sigmaDV.set(0.5)
@@ -92,19 +96,18 @@ class FrameM1:
         
 
     def process_save(self):
-        '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image'''
+        '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image, qui se fera eh un format VRML'''
         fig=mlab.figure(1)#Focus sur la bonne fenêtre
-        chemin = tkFileDialog.asksaveasfilename(parent=self.parent,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")
+        chemin = tkFileDialog.asksaveasfilename(parent=self.parent,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")#Ouverture d'une fenêtre annexe demandant le chemin d'enregistrement.
         if chemin=='':#Petite sécurité pour moins d'erreur. Si,lors de l'instruction précédente, l'utilisateur a appuyé sur annuler, la chemin retourné est vide. On signale donc que le programme ne va pas sauvegarder
-            root2=Tk.Toplevel()
+            root2=Tk.Toplevel()#On ouvre une fenêtre pour signaler la non sauvegarde
             texte=Tk.Label(root2,text='La sauvegarde a échoué.\nChemin spécifié non valide',height=2)
-            btOk=Tk.Button(root2,text='Ok',command=root2.destroy)#Affichage d'une fenêtre pour signifier l'échec
+            btOk=Tk.Button(root2,text='Ok',command=root2.destroy)
             texte.pack()
             btOk.pack()
             root2.mainloop()
-            return None
         mlab.savefig(chemin)#Le fichier est enregistré
-        #Bloc pour modifier l'extension du fichier, et faire en sorte de ne pas effacer un autre fichier image. L'extension doit être modifiée, car, pour Blender, les fichiers VRML ont une extension en .wrl
+        #Bloc pour modifier l'extension du fichier, et faire en sorte de ne pas effacer un autre fichier image. L'extension doit être modifiée, car, pour Blender, le logiciel utilisé pour lire les fichiers crées, les fichiers VRML ont une extension en .wrl
         nom, ext = os.path.splitext(chemin) #Le nom et l'extension du fichier sont séparés
         i=0# Le fichier est nommé par défaut image. Pour ne pas effacer d'autres fichiers, on rajoute _i à la fin du nom, où i est un nombre. i est incrémenté jusqu'à ce que l'emplacement soit disponible
         nom=nom+"_"
@@ -115,40 +118,41 @@ class FrameM1:
         #Fin du bloc
     
     def montagne(self):
+        '''Procédure contenant la création de la montagne et son affichage'''
         def milieu_triangle (T) :
-            '''Retourne sous forme d'un ponit le centre du triangle donné en argument'''
+            '''Retourne sous forme d'un point le centre du triangle donné en argument'''
             C= (T.point1+T.point2+T.point3)/3.0 #C devient le centre du triangle
             return(C)
          
         def Normale(T, distance,centre):
-            '''Retourne trois triangles issus du triangle T dont le centre a été déplacé de la distance distance.
-               L'argument centrepermet de déterminer l'intérieur de la structure'''
+            '''Retourne trois triangles issus du triangle T dont le centre a été déplacé de la distance donnée.
+               L'argument centre permet de déterminer l'intérieur de la structure'''
+            #On initialise les variables
             M=milieu_triangle(T)
             p1=T.point1
             p2=T.point2
             p3=T.point3
-            u=p1-p2#On calcule les deux vecteurs
+            u=p1-p2#On calcule deux vecteurs, qui correspondent à 2 cotés du triangle
             v=p1-p3
-            #Voilà fifi le produit vectoriel
-            w=u^v
-            norme=(float(w & w))**1/2 #Norme de w=produit scalaire par lui même à la racine carrée
+            w=u^v#On calcule leur produit vectoriel
+            norme=(float(w & w))**1/2 #Norme de w = produit scalaire par lui même à la racine carrée
             w=w/norme#w est maintenant normé
             a=centre-M#Vecteur allant du centre du triangle au point centre, qui est à l'interieur de la structure
             if w & a >0: #On fait le produit scalaire des 2 vecteurs. Si le produit scalaire est positif, cela signifie que les 2 vecteurs sont environ du même sens, donc que w pointe vers l'interieur
                 w=-1*w#On prend l'opposé de w, qui pointe alors vers l'exterieur
-            p4=M+distance*w#point sur la normale
+            p4=M+distance*w#Centre déplacé selon la normale vers l'exterieur
             return(p4)
             
         def creation_triangle(T,distance,centre):
+            '''Procédure qui au triangle T et à la distance distance retourne les 3 nouveaux triangles crées'''
             C=Normale(T,distance,centre)
             T1=Triangle(T.point1,T.point2,C)
             T2=Triangle(T.point1,T.point3,C)
             T3=Triangle(T.point2,T.point3,C)
             return[T1,T2,T3] #retourner les triangles dans une liste pour être compatible avec la boucle principale
         
-        def creation_image(liste,save="True",chemin="ask"):
-            '''Créé le dessin, à partir de la liste entréé. 
-            La variable save gère si l'image est enregistrée (Par défaut,oui), à l'emplacement "chemin". Par défaut,l'emplacement est demandé à l'utilisateur'''
+        def creation_image(liste):
+            '''Créé le dessin, à partir de la liste entréé'''
             X=[]#Initialisation des 3 listes contenant les coordonnées des sommets des triangles
             Y=[]
             Z=[]
@@ -163,32 +167,35 @@ class FrameM1:
             Z=np.array(Z)
             return mlab.triangular_mesh(X,Y,Z,tri,colormap='gist_earth') #La figure est dessinée
         
+        #On initialise les variables qui seront utilisées
         espe=self.espeDV.get()
         decr_espe=self.decr_espeDV.get()
         sigma=self.sigmaDV.get()
         decr_sigma=self.decr_sigmaDV.get()
+        #On crée le triangle qui servira de base et on fait la prmière étape à part
         triangle_0=Triangle(Point(0,0,0),Point(1,0,0),Point(0,1,0))
         distance = abs(gauss(0.8,0.2))
         liste=creation_triangle(triangle_0,distance,Point(0,0,-1))
+        #On détermine le centre de la structure, qui nous servira de point de repère pour déterminer où est l'interieur et l'exterieur
         centre_1=milieu_triangle(liste[0])
         centre_2=milieu_triangle(liste[1])
         centre_3=milieu_triangle(liste[2])
         centre=milieu_triangle(Triangle(centre_1,centre_2,centre_3))
-        for i in range(self.nb_etapesIV.get()):
-            for j in range(len(liste)):
-                distance = gauss(espe*decr_espe**(i+1),sigma*decr_sigma**(i+1))#Donne un nombre aléatoire selon une répartition gaussienne. A voir pour les paramètres ( le premier est la valeur moyenne, le second l’écart type)
-                liste=liste+creation_triangle(liste.pop(0),distance,centre)#Enlève un triangle à la liste pour ajouter les trois triangles qui en sont issus
+        for i in range(self.nb_etapesIV.get()):#On fait le nombre d'itérations spécifié par l'utilisateur
+            for j in range(len(liste)):#Pour chaque triangle présent dans la structure
+                distance = gauss(espe*decr_espe**(i+1),sigma*decr_sigma**(i+1))#Donne un nombre aléatoire selon une répartition gaussienne. Les paramètres sont déterminés par l'utilisateur
+                liste=liste+creation_triangle(liste.pop(0),distance,centre)#Enlève un triangle à la liste pour ajouter les trois nouveaux triangles qui en sont issus
         
-        for i in range(len(liste)):#On transforme chaque élément de la liste, pour que le module d'affichage 3d puisse en faire qqchose
+        for i in range(len(liste)):#On transforme chaque élément de la liste d'objet Triangle à une liste de triplet, pour que le module d'affichage 3d puisse en faire qqchose
             triangle=liste[i]
             liste[i]=[(triangle.point1.xP,triangle.point1.yP,triangle.point1.zP),(triangle.point2.xP,triangle.point2.yP,triangle.point2.zP),(triangle.point3.xP,triangle.point3.yP,triangle.point3.zP)]
         fig=mlab.figure(1)
         mlab.clf()#La fenêtre de dessin est initialisée
-        mlab.draw(creation_image(liste))
+        mlab.draw(creation_image(liste))#On dessine la montagne
 
-class FrameM2:
-    def __init__(self,parent,frame):
-        self.frame=frame
+class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
+    def __init__(self,parent):
+        self.frame=Tk.Frame(parent)
         self.parent=parent
         #Déclaration des variables, de telle sorte qu'elles puissent être utilisées par les boutons/widgets de Tkinter
         self.hauteurDV=Tk.DoubleVar()#équivalent à un nombre àvirgule flottante
@@ -196,35 +203,32 @@ class FrameM2:
         self.nb_etapesIV=Tk.IntVar()#équivalent à un nombre entier
         self.generateurSV=Tk.StringVar()
         self.generateur=1
+        #On paramètre le cadre graphique
         for i in range(3):
             self.frame.rowconfigure(i,minsize=80)
         for i in range(3):
             self.frame.columnconfigure(i,minsize=80)
+        #On crée un nouveau carde, qui servira à une organisation plus poussée des widgets
         self.frame_org=Tk.Frame(self.frame)
         for i in range(3):
             self.frame_org.columnconfigure(i,minsize=107)
-        btSave=Tk.Button(self.frame_org,text='Save',command=self.process_save,width=8)#Bouton permettant de lancer process_save(), qui sauvegarde l'image
-        btDecr=Tk.Scale(self.frame,orient="horizontal",from_=0.0,to=1.0,label="Decroissance",resolution=-1,variable=self.decroissanceDV)# Widget permettant de choisir une valeur pour decroissanceDV
-        btHt=Tk.Scale(self.frame,orient="horizontal",length=150,from_=0.0,to=5.0,label="Hauteur",resolution=-1,variable=self.hauteurDV)# Widget permettant de choisir une valeur pour hauteurDV
-        btEtapes=Tk.Scale(self.frame,orient="horizontal",from_=1,to=8,label="Etapes",resolution=1,variable=self.nb_etapesIV)# Widget permettant de choisir une valeur pour nb_etapesDV. La résolution est de 1, pour avoir des valeurs entières
-        btLaunch=Tk.Button(self.frame_org,text="Launch",command=self.process_launch,width=8)#Bouton lancant process_launch(), qui permet la création d'un dessin
-        btGen=Tk.Button(self.frame,command=self.change_gen,textvariable=self.generateurSV,width=8)
-        #On affiche tous, sans organisation particulière, grace à grid(), qui permet d'organiser
         self.frame_org.grid(column=0,columnspan=6,row=2)
-        btHt.grid(column=0,row=0)
-        Tk.Label(self.frame,anchor='e',text='Generateur').grid(column=1,row=0,sticky='e')
-        btDecr.grid(column=0,row=1)
-        btEtapes.grid(column=1,row=1,columnspan=2)
-        btGen.grid(column=2,row=0)
-        btLaunch.grid(column=0,row=0)
-        btSave.grid(column=1,row=0)
+        #On crée et on place tous les widgets dans le cadre principal
+        Tk.Scale(self.frame,orient="horizontal",from_=0.0,to=1.0,label="Decroissance",resolution=-1,variable=self.decroissanceDV).grid(column=0,row=1)# Widget permettant de choisir une valeur pour decroissanceDV
+        Tk.Scale(self.frame,orient="horizontal",length=150,from_=0.0,to=5.0,label="Hauteur",resolution=-1,variable=self.hauteurDV).grid(column=0,row=0)# Widget permettant de choisir une valeur pour hauteurDV
+        Tk.Scale(self.frame,orient="horizontal",from_=1,to=8,label="Etapes",resolution=1,variable=self.nb_etapesIV).grid(column=1,row=1,columnspan=2)# Widget permettant de choisir une valeur pour nb_etapesDV. La résolution est de 1, pour avoir des valeurs entières
+        Tk.Button(self.frame,command=self.change_gen,textvariable=self.generateurSV,width=8).grid(column=2,row=0)#Bouton permettant de lancer change_gen(), qui va changer le générateur aléatoire utilisé
+        Tk.Label(self.frame,anchor='e',text='Generateur').grid(column=1,row=0,sticky='e')#Texte pour nommer le bouton qui change le générateur
+        #On crée et on place les éléments dans le cadre secondaire
+        Tk.Button(self.frame_org,text='Save',command=self.process_save,width=8).grid(column=1,row=0)#Bouton permettant de lancer process_save(), qui sauvegarde l'image
+        Tk.Button(self.frame_org,text="Launch",command=self.process_launch,width=8).grid(column=0,row=0)#Bouton lancant process_launch(), qui permet la création d'un dessin
         #On change les valeurs, afin qu'elles soient plus proche des valeurs intéressantes
-        btDecr.set(0.4)
-        btHt.set(2.5)
-        btEtapes.set(6)
+        self.decroissanceDV.set(0.4)
+        self.hauteurDV.set(2.5)
+        self.nb_etapesIV.set(6)
         self.generateurSV.set('Gaussien')
         
-    def change_gen(self):
+    def change_gen(self):#Procédure permettant de faire la rotation entre les 3 générateurs et de changer le texte du bouton lié
         self.generateur+=1
         self.generateur%=3
         if self.generateur==2:
@@ -234,14 +238,14 @@ class FrameM2:
         else:
             self.generateurSV.set('Uniforme')
 
-    def random(self,value):
+    def random(self,value):#Procédure qui permet de retourner un déplacement aléatoire en fonction du générateur de nombre demandé
         gen=self.generateur
         if gen==1:
-            return gauss(0,value)
+            return gauss(0,value) #Génération gaussienne centrée en 0 et d'écart type valeur
         elif gen==2:
-            return expovariate(1/value)
+            return expovariate(1/value) #Géneration exponentielle d'espérance valeur
         else:
-            return (random()-0.5)*2.5*value
+            return (random()-0.5)*value*12**0.5 #Géneration uniforme centrée en 0 et d'écart type valeur.
 
     def terrain(self,triangles,cotes,nb_etapes):
         '''Contient tout pour la génération de terrain'''
@@ -251,7 +255,7 @@ class FrameM2:
             b=B.dist(C)
             c=C.dist(A)
             s=(a+b+c)/2
-            Aire=(s*(s-a)*(s-b)*(s-c))**0.5 #La formule magique ! Pour être précis, la formule de Héron
+            Aire=(s*(s-a)*(s-b)*(s-c))**0.5 #La formule de Héron, donnat l'aire du triangle en fonction de la longueur des cotés
             return(Aire)
         
         def creation_image(liste):
@@ -416,31 +420,27 @@ class FrameM2:
         os.rename(chemin, nom + ".wrl")#Instruction permettant de renommer le fichier "chemin" en nom +".wrl", qui est le même nom, à l'extension et un nombre à la fin près
         #Fin du bloc
 
-
 def main():
     '''Procédure principale créant une fenêtre graphique'''
+    #On crée la fenêtre principale et les différents cadre graphiques 
     root=Tk.Tk()
-    frameM1=Tk.Frame(root)
-    frameM2=Tk.Frame(root)
     frameP=Tk.Frame(root)
-    frameM1.grid(row=0, column=0, sticky='news')
-    frameM2.grid(row=0, column=0, sticky='news')
+    frameM1=Methode1(root)
+    frameM2=Methode2(root)
+    frameM1.frame.grid(row=0, column=0, sticky='news')
+    frameM2.frame.grid(row=0, column=0, sticky='news')
     frameP.grid(row=0, column=0, sticky='news')
-    frameM1=FrameM1(root,frameM1)
-    frameM2=FrameM2(root,frameM2)
+    #On configure le acdre principal
     for i in range(6):
         frameP.rowconfigure(i,minsize=40)
     for i in range(4):
         frameP.columnconfigure(i,minsize=80)
-    Tk.Button(frameM2.frame_org,text='Retour',command=frameP.tkraise,width=8).grid(column=2,row=0)
-    Tk.Button(frameM1.frame,text='Retour',command=frameP.tkraise,width=8).grid(row=3,column=4,columnspan=2)
+    #On ajoute les boutons au cadre principal
     Tk.Button(frameP,text='Methode 1',command=frameM1.frame.tkraise,width=12).grid(column=0,columnspan=2,row=0,rowspan=5)
     Tk.Button(frameP,text='Methode 2',command=frameM2.frame.tkraise,width=12).grid(column=2,columnspan=2,row=0,rowspan=5)
     Tk.Button(frameP,text="Quitter",command=root.destroy,width=8).grid(column=0,columnspan=4,row=5,sticky='se',pady=10,padx=10)
+    #On ajoute les boutons permettant de retourner au cadre principal aux 2 cadres graphiques des 2 méthodes
+    Tk.Button(frameM2.frame_org,text='Retour',command=frameP.tkraise,width=8).grid(column=2,row=0)
+    Tk.Button(frameM1.frame,text='Retour',command=frameP.tkraise,width=8).grid(row=3,column=4,columnspan=2)
     fig=mlab.figure(1)#On affiche la fenêtre mayavi, afin que l'utilisateur puisse la bouger
-    #root.mainloop()
 main()
-
-
-
-
