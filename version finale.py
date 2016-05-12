@@ -96,7 +96,7 @@ class Methode1:#Classe contenant tout ce qui est en rappport avec la méthode 1 
         
 
     def process_save(self):
-        '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image, qui se fera eh un format VRML'''
+        '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image, qui se fera en un format VRML'''
         fig=mlab.figure(1)#Focus sur la bonne fenêtre
         chemin = tkFileDialog.asksaveasfilename(parent=self.parent,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")#Ouverture d'une fenêtre annexe demandant le chemin d'enregistrement.
         if chemin=='':#Petite sécurité pour moins d'erreur. Si,lors de l'instruction précédente, l'utilisateur a appuyé sur annuler, la chemin retourné est vide. On signale donc que le programme ne va pas sauvegarder
@@ -398,19 +398,18 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
         mlab.draw(self.terrain([(0,1,2),(2,3,4),(4,5,6)],[(Point(0,0,0),Point(1,0,0)),(Point(1,0,0),Point(1,1,0)),(Point(0,0,0),Point(1,1,0)),(Point(1,1,0),Point(0,1,0)),(Point(0,0,0),Point(0,1,0)),(Point(0,0,0),Point(-1,1,0)),(Point(-1,1,0),Point(0,1,0))],nb_etapes))#On affiche le dessin
         
     def process_save(self):
-        '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image'''
+        '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image, qui se fera en un format VRML'''
         fig=mlab.figure(1)#Focus sur la bonne fenêtre
-        chemin = tkFileDialog.asksaveasfilename(parent=self.parent,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")
+        chemin = tkFileDialog.asksaveasfilename(parent=self.parent,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")#Ouverture d'une fenêtre annexe demandant le chemin d'enregistrement.
         if chemin=='':#Petite sécurité pour moins d'erreur. Si,lors de l'instruction précédente, l'utilisateur a appuyé sur annuler, la chemin retourné est vide. On signale donc que le programme ne va pas sauvegarder
-            root2=Tk.Toplevel()
+            root2=Tk.Toplevel()#On ouvre une fenêtre pour signaler la non sauvegarde
             texte=Tk.Label(root2,text='La sauvegarde a échoué.\nChemin spécifié non valide',height=2)
-            btOk=Tk.Button(root2,text='Ok',command=root2.destroy)#Affichage d'une fenêtre pour signifier l'échec
+            btOk=Tk.Button(root2,text='Ok',command=root2.destroy)
             texte.pack()
             btOk.pack()
             root2.mainloop()
-            return None
         mlab.savefig(chemin)#Le fichier est enregistré
-        #Bloc pour modifier l'extension du fichier, et faire en sorte de ne pas effacer un autre fichier image. L'extension doit être modifiée, car, pour Blender, les fichiers VRML ont une extension en .wrl
+        #Bloc pour modifier l'extension du fichier, et faire en sorte de ne pas effacer un autre fichier image. L'extension doit être modifiée, car, pour Blender, le logiciel utilisé pour lire les fichiers crées, les fichiers VRML ont une extension en .wrl
         nom, ext = os.path.splitext(chemin) #Le nom et l'extension du fichier sont séparés
         i=0# Le fichier est nommé par défaut image. Pour ne pas effacer d'autres fichiers, on rajoute _i à la fin du nom, où i est un nombre. i est incrémenté jusqu'à ce que l'emplacement soit disponible
         nom=nom+"_"
