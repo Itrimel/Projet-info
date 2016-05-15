@@ -4,7 +4,6 @@
 from sympy import N #Pour les arrondis dans la classe Point
 from random import gauss,expovariate,random #Pour les déplacements aléatoires
 import tkFileDialog #Module pour que l'utilisateur choisisse l'endroit où enregistrer
-import numpy as np #Module pour l'organisation des coordonnées lors de la phase de génération de l'image par mayavi
 import os #Module pour rennomer le fichier image créé
 from mayavi import mlab #Module pour générer le dessin
 import Tkinter as Tk #Pour les fenêtres graphiques
@@ -162,9 +161,6 @@ class Methode1:#Classe contenant tout ce qui est en rappport avec la méthode 1 
                     X=X+[point[0]]
                     Y=Y+[point[1]]
                     Z=Z+[point[2]]
-            X=np.array(X)#Les listes sont converties en un format reconnu par mlab
-            Y=np.array(Y)
-            Z=np.array(Z)
             return mlab.triangular_mesh(X,Y,Z,tri,colormap='gist_earth') #La figure est dessinée
         
         #On initialise les variables qui seront utilisées
@@ -267,8 +263,8 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
             pos=0
             for triangle in liste:#On fait cette boucle pour chaque triangle initial
                 for k in range(1,len(triangle)): #Création de la liste des triangles : on s'intéresse ici aux triangles entre la ligne k-1 et k
-                    nb_a=(k-1)*k/2 #Position globale du premier point de la ligne k-1
-                    nb_b=nb_a+k #Position globale du premier point de la ligne k
+                    nb_a=(k-1)*k/2 #Position globale du premier point de la colonne k-1
+                    nb_b=nb_a+k #Position globale du premier point de la colonne k
                     for i in range(k-1):#Pour chaque point de la ligne k-1 considérée, sauf le dernier
                         tri+=[(pos+nb_a,pos+nb_b,pos+nb_b+1),(pos+nb_a,pos+nb_a+1,pos+nb_b+1)] #On ajoute 2 triangles
                         nb_a+=1 #On passe aux points prochains
@@ -280,9 +276,6 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
                         X=X+[point.xP]
                         Y=Y+[point.yP]
                         Z=Z+[point.zP]
-            X=np.array(X)#Les listes sont converties en un format reconnu par mayavi
-            Y=np.array(Y)
-            Z=np.array(Z)
             return mlab.triangular_mesh(X,Y,Z,tri,colormap="gist_earth") #La figure est dessinée, avec des couleurs correspondant à un terrain
     
         def modif_rang_ajout(self,liste,pos,i,sigma):
@@ -421,7 +414,7 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
 
 def main():
     '''Procédure principale créant une fenêtre graphique'''
-    #On crée la fenêtre principale et les différents cadre graphiques 
+    #On crée la fenêtre principale et les différents cadres graphiques 
     root=Tk.Tk()
     frameP=Tk.Frame(root)
     frameM1=Methode1(root)
@@ -429,7 +422,7 @@ def main():
     frameM1.frame.grid(row=0, column=0, sticky='news')
     frameM2.frame.grid(row=0, column=0, sticky='news')
     frameP.grid(row=0, column=0, sticky='news')
-    #On configure le acdre principal
+    #On configure le cadre principal
     for i in range(6):
         frameP.rowconfigure(i,minsize=40)
     for i in range(4):
@@ -441,5 +434,6 @@ def main():
     #On ajoute les boutons permettant de retourner au cadre principal aux 2 cadres graphiques des 2 méthodes
     Tk.Button(frameM2.frame_org,text='Retour',command=frameP.tkraise,width=8).grid(column=2,row=0)
     Tk.Button(frameM1.frame,text='Retour',command=frameP.tkraise,width=8).grid(row=3,column=4,columnspan=2)
+    frameP.tkraise() #On met en avant le cadre permettant de choisir la méthode
     fig=mlab.figure(1)#On affiche la fenêtre mayavi, afin que l'utilisateur puisse la bouger
 main()
