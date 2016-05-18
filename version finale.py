@@ -243,7 +243,7 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
         else:
             return (random()-0.5)*value*12**0.5 #Géneration uniforme centrée en 0 et d'écart type valeur.
 
-    def terrain(self,triangles,cotes,nb_etapes):
+    def terrain(self,triangles,cotes):
         '''Contient tout pour la génération de terrain'''
         def aire_tri(A,B,C):
             '''Retourne l'aire du triangle ABC'''
@@ -294,7 +294,7 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
             decroissance=self.decroissanceDV.get()#On récupère la valeur de decroissance
             ligne_a=liste[pos-1] #On stocke les 2 lignes entre lesquelles sera ajouté la nouvelle ligne
             ligne_b=liste[pos]
-            if cote_0:#Si ce coté a été déja fait, cote_0 est une liste et l'içnstruction conditionelle if sera activée. Si il n'a pas été fait, cote_0 contien False, l'instruction conditionelle else sera activée
+            if cote_0:#Si ce coté a été déja fait, cote_0 est une liste et l'instruction conditionelle if sera activée. Si il n'a pas été fait, cote_0 contien False, l'instruction conditionelle else sera activée
                 ligne_nouv=[cote_0[(2*pos-1)*(2**(numero_etape_actuelle-i-1))]] #On crée la nouvelle ligne avec le bon premier point. Il faut me croire pour la position du point dans la liste 
             else: #On crée la nouvelle ligne avec le premier point, milieu du segment formé par les premiers points des 2 lignes précédentes.
                 ligne_nouv=[(ligne_a[0]+ligne_b[0])/2.0 + Point(0,0,self.random(sigma*decroissance**(i+1)))]
@@ -310,15 +310,16 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
                 pos_b+=1 #On ajuste la position du point de la deuxième ligne afin d'obtenir le prochain point lors du prochain passage dans la boucle
                 ligne_nouv+=[point1,point2] #On ajoute les 2 points à la ligne
             if cote_2:# Même chose que pour cote_0
-                ligne_nouv+=cote_2[(2*pos-1)*(2**(numero_etape_actuelle-i-1))]
+                ligne_nouv+=[cote_2[(2*pos-1)*(2**(numero_etape_actuelle-i-1))]]
             else:
                 ligne_nouv+=[(ligne_a[-1]+ligne_b[-1])/2.0 + Point(0,0,self.random(sigma*decroissance**(i+1)))]#Ici, on prend le milieu des derniers points des lignes,d'où le -1
             return [ligne_nouv] #On retourne la nouvelle ligne formée
     
     
-        def modif_triangle(self,triangle,cotes_deja_faits,nb_etapes):
+        def modif_triangle(self,triangle,cotes_deja_faits):
             '''Procédure gérant la génération de terrain à l'échelle d'un triangle initial '''
             hauteur=self.hauteurDV.get() #On récupère la hauteur
+            nb_etapes=self.nb_etapesIV.get()#On récupère le nombre d'étapes
             aire=aire_tri(triangle[0],triangle[1],triangle[2])#On calcule l'aire du triangle
             sigma=aire*hauteur# On attribue à sigma une valeur proportionnelle à l'aire du triangle, afin de moduler les variations de hauteur en fonction de la taille du triangle
             liste=[[triangle[0]],[triangle[1],triangle[2]]] #On crée une liste avec les 3 sommets du triangle. C'est un exemple du format utilisé : une liste de liste, chaqu'une de ces listes contient des points correspondant à une ligne de points du triangle
@@ -344,10 +345,7 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
                     #Lors de l'ajout de nouveaux points, il se passe 2 choses : on créé de nouvelles lignes, et on ajoute des points aux lignes existantes, d'où les 2 procédures
                     liste2 = liste2 + modif_rang_creation(self,liste,pos,i,cote_0,cote_2,nb_etapes,sigma) + modif_rang_ajout(self,liste,pos,i,sigma)
                 if cote_1:#Si le cote est deja fait, c'est équivalent à True, si c'est False, le coté est pas fait et on passe dans la partie else
-                    dernier_cote=[cote_1[0]]
-                    for k in range(2**(i+1)):#On récupère tout les points dont on a besoin pour le dernier coté
-                        dernier_cote=dernier_cote + [cote_1[k*(2**(nb_etapes-i-1))]]
-                    dernier_cote=[dernier_cote]
+                    dernier_cote=[[cote_1[k*(2**(nb_etapes-i-1))] for k in range(2**(i+1)+1)]] #On récupère tout les points dont on a besoin pour le dernier coté
                 else:
                     dernier_cote = modif_rang_ajout(self,liste,len(liste)-1,i,sigma)#On utilise la même procédure que pour étendre les autres lignes
                 liste2= liste2 + modif_rang_creation(self,liste,len(liste)-1,i,cote_0,cote_2,nb_etapes,sigma) + dernier_cote #On fait à part, car les points de la dernière ligne peuvent ou ne peuvent pas être ajoutés aléatoirement
@@ -361,12 +359,15 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
         for tri in triangles:#Pour chaque triangle
             cotes_du_tri=[cotes[tri[0]],cotes[tri[1]],cotes[tri[2]]]#La liste des cotés du triangle considéré
             cotes_deja_faits=[etat_des_cotes[tri[0]],etat_des_cotes[tri[1]],etat_des_cotes[tri[2]]]#La liste de l'état des cotés. Si ils sont faits, il y a la liste des points du coté. Sinon, il y a False
-            if cotes_du_tri[1][0]==cotes[tri[0]][0] or cotes_du_tri[1][0]==cotes[tri[0]][1]:#On crée le triangle : les 2 premiers sommets sont les 2 points du premier côté, le troisième est le point du deuxième côté qui n'est pas déjà présent dans le premier côté, d'où la condition
-                point_3=cotes_du_tri[1][1]
-            else:
-                point_3=cotes_du_tri[1][0]
-            triangle=[cotes_du_tri[0][0],cotes_du_tri[0][1],point_3]#Création du triangle
-            triangle=modif_triangle(self,triangle,cotes_deja_faits,nb_etapes)#Formation du terrain à partir du triangle
+            if cotes_du_tri[0][0]==cotes_du_tri[1][0] :#On crée le triangle : les 2 premiers sommets sont les 2 points du premier côté, le troisième est le point du deuxième côté qui n'est pas déjà présent dans le premier côté, d'où la condition
+                triangle=[cotes_du_tri[0][1],cotes_du_tri[0][0],cotes_du_tri[1][1]]
+            elif cotes_du_tri[0][0]==cotes_du_tri[1][1]:
+                triangle=[cotes_du_tri[0][1],cotes_du_tri[0][0],cotes_du_tri[1][0]]
+            elif cotes_du_tri[0][1]==cotes_du_tri[1][0]:
+                triangle=[cotes_du_tri[0][0],cotes_du_tri[0][1],cotes_du_tri[1][1]]
+            else :
+                triangle=[cotes_du_tri[0][0],cotes_du_tri[0][1],cotes_du_tri[1][0]]
+            triangle=modif_triangle(self,triangle,cotes_deja_faits)#Formation du terrain à partir du triangle
             if not cotes_deja_faits[0]:#Stokage des infos sur les côtés faits : si le côté vient d'être fait, la liste des points est stockée dans la liste etat_des_cotes à la bonne position
                 cote_0=[]            
                 for k in range(len(triangle)):#On récupère tout les points, qui sont les premiers points de chaque ligne du triangle
@@ -378,17 +379,16 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
                     cote_2+=[triangle[k][-1]]
                 etat_des_cotes[tri[2]]=cote_2
             if not cotes_deja_faits[1]:#Pareil
-                etat_des_cotes[tri[1]]=triangle[-1]#Ici, c'est la dernière ligne du triangle          
+                etat_des_cotes[tri[1]]=triangle[-1]#Ici, c'est la dernière ligne du triangle
             liste+=[triangle]#On ajoute la liste des points du triangle à la liste globale contenant tout
         return creation_image(liste)#On retourne le dessin
     
         
     def process_launch(self):
         '''Procédure reliant une fenetre graphique et le coeur du programme'''
-        nb_etapes=self.nb_etapesIV.get()#On récupère le nombre d'étapes
         fig=mlab.figure(1)
         mlab.clf()#La fenêtre de dessin est initialisée
-        mlab.draw(self.terrain([(0,1,2),(2,3,4),(4,5,6)],[(Point(0,0,0),Point(1,0,0)),(Point(1,0,0),Point(1,1,0)),(Point(0,0,0),Point(1,1,0)),(Point(1,1,0),Point(0,1,0)),(Point(0,0,0),Point(0,1,0)),(Point(0,0,0),Point(-1,1,0)),(Point(-1,1,0),Point(0,1,0))],nb_etapes))#On affiche le dessin
+        mlab.draw(self.terrain([(0,1,2),(3,2,4),(6,4,5)],[(Point(0,0,0),Point(1,0,0)),(Point(1,0,0),Point(1,1,0)),(Point(0,0,0),Point(1,1,0)),(Point(1,1,0),Point(0,1,0)),(Point(0,0,0),Point(0,1,0)),(Point(0,0,0),Point(-1,1,0)),(Point(-1,1,0),Point(0,1,0))]))#On affiche le dessin
         
     def process_save(self):
         '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image, qui se fera en un format VRML'''
