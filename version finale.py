@@ -98,13 +98,14 @@ class Methode1:#Classe contenant tout ce qui est en rappport avec la méthode 1 
         '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image, qui se fera en un format VRML'''
         fig=mlab.figure(1)#Focus sur la bonne fenêtre
         chemin = tkFileDialog.asksaveasfilename(parent=self.parent,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")#Ouverture d'une fenêtre annexe demandant le chemin d'enregistrement.
-        if chemin=='':#Petite sécurité pour moins d'erreur. Si,lors de l'instruction précédente, l'utilisateur a appuyé sur annuler, la chemin retourné est vide. On signale donc que le programme ne va pas sauvegarder
+        if chemin=='' or os.path.splitext(chemin)[1]!='.vrml':#Petite sécurité pour moins d'erreur. Si,lors de l'instruction précédente, l'utilisateur a appuyé sur annuler, la chemin retourné est vide. On signale donc que le programme ne va pas sauvegarder. Si il a entré une mauvaise extension, la sauvegarde est annulée
             root2=Tk.Toplevel()#On ouvre une fenêtre pour signaler la non sauvegarde
-            texte=Tk.Label(root2,text='La sauvegarde a échoué.\nChemin spécifié non valide',height=2)
+            texte=Tk.Label(root2,text='La sauvegarde a échoué.\nExtension spécifiée non valide',height=2)
             btOk=Tk.Button(root2,text='Ok',command=root2.destroy)
             texte.pack()
             btOk.pack()
             root2.mainloop()
+            return None
         mlab.savefig(chemin)#Le fichier est enregistré
         #Bloc pour modifier l'extension du fichier, et faire en sorte de ne pas effacer un autre fichier image. L'extension doit être modifiée, car, pour Blender, le logiciel utilisé pour lire les fichiers crées, les fichiers VRML ont une extension en .wrl
         nom, ext = os.path.splitext(chemin) #Le nom et l'extension du fichier sont séparés
@@ -115,6 +116,7 @@ class Methode1:#Classe contenant tout ce qui est en rappport avec la méthode 1 
         nom=nom+str(i)
         os.rename(chemin, nom + ".wrl")#Instruction permettant de renommer le fichier "chemin" en nom +".wrl", qui est le même nom, à l'extension et un nombre à la fin près
         #Fin du bloc
+
     
     def montagne(self):
         '''Procédure contenant la création de la montagne et son affichage'''
@@ -359,7 +361,8 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
         for tri in triangles:#Pour chaque triangle
             cotes_du_tri=[cotes[tri[0]],cotes[tri[1]],cotes[tri[2]]]#La liste des cotés du triangle considéré
             cotes_deja_faits=[etat_des_cotes[tri[0]],etat_des_cotes[tri[1]],etat_des_cotes[tri[2]]]#La liste de l'état des cotés. Si ils sont faits, il y a la liste des points du coté. Sinon, il y a False
-            if cotes_du_tri[0][0]==cotes_du_tri[1][0] :#On crée le triangle : les 2 premiers sommets sont les 2 points du premier côté, le troisième est le point du deuxième côté qui n'est pas déjà présent dans le premier côté, d'où la condition
+            #On crée le triplets de points correspondant au triangle, de telle sorte que les 2 premiers points soient ceux du premier cote et le deux derniers ceux du deuxième cote. Les 4 conditions couvrent les 2*2=4 cas possibles
+            if cotes_du_tri[0][0]==cotes_du_tri[1][0] :
                 triangle=[cotes_du_tri[0][1],cotes_du_tri[0][0],cotes_du_tri[1][1]]
             elif cotes_du_tri[0][0]==cotes_du_tri[1][1]:
                 triangle=[cotes_du_tri[0][1],cotes_du_tri[0][0],cotes_du_tri[1][0]]
@@ -394,13 +397,14 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
         '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image, qui se fera en un format VRML'''
         fig=mlab.figure(1)#Focus sur la bonne fenêtre
         chemin = tkFileDialog.asksaveasfilename(parent=self.parent,initialdir="/",defaultextension="vrml",initialfile="image", title="Selectionnez le dossier d'enregistrement")#Ouverture d'une fenêtre annexe demandant le chemin d'enregistrement.
-        if chemin=='':#Petite sécurité pour moins d'erreur. Si,lors de l'instruction précédente, l'utilisateur a appuyé sur annuler, la chemin retourné est vide. On signale donc que le programme ne va pas sauvegarder
+        if chemin=='' or os.path.splitext(chemin)[1]!='.vrml':#Petite sécurité pour moins d'erreur. Si,lors de l'instruction précédente, l'utilisateur a appuyé sur annuler, la chemin retourné est vide. On signale donc que le programme ne va pas sauvegarder. Si il a entré une mauvaise extension, la sauvegarde est annulée
             root2=Tk.Toplevel()#On ouvre une fenêtre pour signaler la non sauvegarde
-            texte=Tk.Label(root2,text='La sauvegarde a échoué.\nChemin spécifié non valide',height=2)
+            texte=Tk.Label(root2,text='La sauvegarde a échoué.\nExtension spécifiée non valide',height=2)
             btOk=Tk.Button(root2,text='Ok',command=root2.destroy)
             texte.pack()
             btOk.pack()
             root2.mainloop()
+            return None
         mlab.savefig(chemin)#Le fichier est enregistré
         #Bloc pour modifier l'extension du fichier, et faire en sorte de ne pas effacer un autre fichier image. L'extension doit être modifiée, car, pour Blender, le logiciel utilisé pour lire les fichiers crées, les fichiers VRML ont une extension en .wrl
         nom, ext = os.path.splitext(chemin) #Le nom et l'extension du fichier sont séparés
