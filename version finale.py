@@ -2,7 +2,7 @@
 #Nécessite un environnement comprenant : Python 2.7, la librairie mayavi et toutes ses dépendances, la librairie wx, la librairie sympy
 #Pour créer un environnement virtuel à l'aide d'Anaconda contenant ces librairies, voir ce lien : http://conda.pydata.org/docs/using/envs.html
 from sympy import N #Pour les arrondis dans la classe Point
-from random import gauss,expovariate,random #Pour les déplacements aléatoires
+from random import gauss,expovariate,random,uniform #Pour les déplacements aléatoires
 import tkFileDialog #Module pour que l'utilisateur choisisse l'endroit où enregistrer
 import os #Module pour rennomer le fichier image créé
 from mayavi import mlab #Module pour générer le dessin
@@ -222,7 +222,7 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
         Tk.Button(self.frame_org,text="Launch",command=self.process_launch,width=8).grid(column=0,row=0)#Bouton lancant process_launch(), qui permet la création d'un dessin
         #On change les valeurs, afin qu'elles soient plus proche des valeurs intéressantes
         self.decroissanceDV.set(0.4)
-        self.hauteurDV.set(2.5)
+        self.hauteurDV.set(1.8)
         self.nb_etapesIV.set(6)
         self.generateurSV.set('Gaussien')
         
@@ -244,6 +244,72 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
             return expovariate(1/value) #Géneration exponentielle d'espérance valeur
         else:
             return (random()-0.5)*value*12**0.5 #Géneration uniforme centrée en 0 et d'écart type valeur.
+    
+    def base_Triangle(self,nb_points,xmax,ymax):   
+        def appartenance_Triangle(L_Triangle, P):
+            #permutations pour effectuer la procédure sur les 3 côtés du triangle
+            #on utilise cette liste pour alléger l'écriture
+            L_Permutations=[(0,1,2),(0,2,1),(1,2,0)]
+            #la boucle effectue la vérification sur les 3 côtés
+            for (a,b,c) in L_Permutations:
+                if ((L_Triangle[a][1]-L_Triangle[b][1])*L_Triangle[c][0]+(L_Triangle[b][0]-L_Triangle[a][0])*L_Triangle[c][1]+(L_Triangle[a][0]*L_Triangle[b][1]-L_Triangle[b][0]*L_Triangle[a][1]))*((L_Triangle[a][1]-L_Triangle[b][1])*P.xP+(L_Triangle[b][0]-L_Triangle[a][0])*P.yP+(L_Triangle[a][0]*L_Triangle[b][1]-L_Triangle[b][0]*L_Triangle[a][1]))<0:
+                    #si le produit est négatif, donc si le point n'est pas du même côté que le 3ème sommet, on abandonne
+                    return(False)
+                    #sinon, si c'est bon pour les 3 côtés, le point appartient au triangle
+            return(True)
+        
+        def aretes_liste(cote,L_Aretes):
+            i=0
+            while i<=len(L_Aretes):
+                if i==len(L_Aretes):
+                    L_Aretes+=[cote]
+                    return(i,L_Aretes)
+                arete_i=L_Aretes[i]
+                if (arete_i[0]==cote[0] and arete_i[1]==cote[1]) or (arete_i[0]==cote[1] and arete_i[1]==cote[0]):
+                    return(i,L_Aretes)
+                i+=1
+    
+        L_Rectangle=[(0,0),(xmax,0),(xmax,ymax),(0,ymax)]
+        #LL_Triangles est une liste de listes, chaque sous-liste représentant 1 triangle
+        LL_Triangles=[]
+        x=uniform(xmax/4,xmax*3/4)
+        y=uniform(ymax/4,ymax*3/4)
+        #on crée à la main les 4 premières sous-listes à partir du rectangle et du premier point aléatoire
+        LL_Triangles.append([L_Rectangle[0],L_Rectangle[1],(x,y)])
+        LL_Triangles.append([L_Rectangle[1],L_Rectangle[2],(x,y)])
+        LL_Triangles.append([L_Rectangle[2],L_Rectangle[3],(x,y)])
+        LL_Triangles.append([L_Rectangle[3],L_Rectangle[0],(x,y)])
+        for i in range(nb_points-1):
+            L_BTriangle=[]
+            #pour que le point aléatoire ne soit pas sur le bord du rectangle
+            x=uniform(xmax/4,xmax*3/4)
+            y=uniform(ymax/4,ymax*3/4)
+            #on définit L_Triangle comme étant un élément de LL_Triangles, càd une liste de 3 points
+            for L_Triangle in LL_Triangles:
+                #on teste l'appartenance de P à l'un des triangles, si c'est validé on renomme la bonne sous-liste
+                if appartenance_Triangle(L_Triangle,Point(x,y)):
+                    L_BTriangle=L_Triangle
+            #on crée trois nouveaux triangles à partir de la bonne sous-liste
+            LL_Triangles.append([L_BTriangle[0],L_BTriangle[1],(x,y)])
+            LL_Triangles.append([L_BTriangle[0],L_BTriangle[2],(x,y)])
+            LL_Triangles.append([L_BTriangle[1],L_BTriangle[2],(x,y)])
+            #et on supprime l'ancien triangle de la liste
+            LL_Triangles.remove(L_BTriangle)
+        print(LL_Triangles)
+        #liste finale des arêtes, sans doublons
+        L_Aretes=[]
+        LF_Triangles=[]
+        
+        for triangle in LL_Triangles:
+            cote_1=[Point(triangle[0][0],triangle[0][1]),Point(triangle[1][0],triangle[1][1])]
+            cote_2=[Point(triangle[1][0],triangle[1][1]),Point(triangle[2][0],triangle[2][1])]
+            cote_3=[Point(triangle[2][0],triangle[2][1]),Point(triangle[0][0],triangle[0][1])]
+            tri=[0,0,0]
+            tri[0],L_Aretes=aretes_liste(cote_1,L_Aretes)
+            tri[1],L_Aretes=aretes_liste(cote_2,L_Aretes)
+            tri[2],L_Aretes=aretes_liste(cote_3,L_Aretes)
+            LF_Triangles+=[tri]    
+        return(LF_Triangles,L_Aretes)
 
     def terrain(self,triangles,cotes):
         '''Contient tout pour la génération de terrain'''
@@ -391,7 +457,8 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
         '''Procédure reliant une fenetre graphique et le coeur du programme'''
         fig=mlab.figure(1)
         mlab.clf()#La fenêtre de dessin est initialisée
-        mlab.draw(self.terrain([(0,1,2),(3,2,4),(6,4,5)],[(Point(0,0,0),Point(1,0,0)),(Point(1,0,0),Point(1,1,0)),(Point(0,0,0),Point(1,1,0)),(Point(1,1,0),Point(0,1,0)),(Point(0,0,0),Point(0,1,0)),(Point(0,0,0),Point(-1,1,0)),(Point(-1,1,0),Point(0,1,0))]))#On affiche le dessin
+        triangles,cotes=self.base_Triangle(2,4,2)
+        mlab.draw(self.terrain(triangles,cotes))#On affiche le dessin
         
     def process_save(self):
         '''Procédure reliant une fenêtre graphique et la sauvegarde de l'image, qui se fera en un format VRML'''
