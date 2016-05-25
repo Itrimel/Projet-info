@@ -259,15 +259,16 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
             return(True)
         
         def aretes_liste(cote,L_Aretes):
+            '''Permet de savoir si le côté est déjà dans la liste des arêtes ou pas, et de retourner la liste avec le côté ajouté, ainsi que sa position à l'interieur'''
             i=0
             while i<=len(L_Aretes):
-                if i==len(L_Aretes):
-                    L_Aretes+=[cote]
-                    return(i,L_Aretes)
+                if i==len(L_Aretes):#Cette condition n'est vérifiée que si on a déjà testé toutes les arêtes. Donc le côté n'est pas déjà présent.
+                    L_Aretes+=[cote]#On ajoute alors le côté à la liste
+                    return(i,L_Aretes)#On retourne la liste modifiée ainsi que la position
                 arete_i=L_Aretes[i]
-                if (arete_i[0]==cote[0] and arete_i[1]==cote[1]) or (arete_i[0]==cote[1] and arete_i[1]==cote[0]):
-                    return(i,L_Aretes)
-                i+=1
+                if (arete_i[0]==cote[0] and arete_i[1]==cote[1]) or (arete_i[0]==cote[1] and arete_i[1]==cote[0]):#Si le côté est déjà présent
+                    return(i,L_Aretes)#On retourne la position actuelle ainsi que la liste des arêtes inchangée
+                i+=1#Si aucune condition n'est vérifiée, on passe à la position suivante
     
         L_Rectangle=[(0,0),(xmax,0),(xmax,ymax),(0,ymax)]
         #LL_Triangles est une liste de listes, chaque sous-liste représentant 1 triangle
@@ -298,16 +299,19 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
         print(LL_Triangles)
         #liste finale des arêtes, sans doublons
         L_Aretes=[]
+        #Liste finale des triplets des triangles
         LF_Triangles=[]
-        
-        for triangle in LL_Triangles:
+        for triangle in LL_Triangles:#pour chaque triangle crée
+            #On crée les trois côtés, et on met les points en forme en utilisant la classe Point
             cote_1=[Point(triangle[0][0],triangle[0][1]),Point(triangle[1][0],triangle[1][1])]
             cote_2=[Point(triangle[1][0],triangle[1][1]),Point(triangle[2][0],triangle[2][1])]
             cote_3=[Point(triangle[2][0],triangle[2][1]),Point(triangle[0][0],triangle[0][1])]
             tri=[0,0,0]
+            #On attribue à chaque côté sa position dans la liste des arêtes, tout en modifiant celle-ci
             tri[0],L_Aretes=aretes_liste(cote_1,L_Aretes)
             tri[1],L_Aretes=aretes_liste(cote_2,L_Aretes)
             tri[2],L_Aretes=aretes_liste(cote_3,L_Aretes)
+            #On ajoute le triangle à la liste des triangles
             LF_Triangles+=[tri]    
         return(LF_Triangles,L_Aretes)
 
