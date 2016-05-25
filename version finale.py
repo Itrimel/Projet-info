@@ -461,7 +461,7 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
         '''Procédure reliant une fenetre graphique et le coeur du programme'''
         fig=mlab.figure(1)
         mlab.clf()#La fenêtre de dessin est initialisée
-        triangles,cotes=self.base_Triangle(2,4,2)
+        triangles,cotes=self.base_Triangle(2,4,2)#On crée la base de triangles par triangulation
         mlab.draw(self.terrain(triangles,cotes))#On affiche le dessin
         
     def process_save(self):
