@@ -296,7 +296,6 @@ class Methode2:#Classe contenant tout ce qui se rapporte à la méthode 2
             LL_Triangles.append([L_BTriangle[1],L_BTriangle[2],(x,y)])
             #et on supprime l'ancien triangle de la liste
             LL_Triangles.remove(L_BTriangle)
-        print(LL_Triangles)
         #liste finale des arêtes, sans doublons
         L_Aretes=[]
         #Liste finale des triplets des triangles
