@@ -32,8 +32,20 @@ def maj_pointeur(triangulation,matr_relation,num_nouv,num_tri):
     except:
         1==1
     return matr_relation
-    
-nb_points=5
+
+def test_triangle(relations,triangulation,point,i):
+    try:
+        triangle=relations.index(i)
+        triangle_temp=triangulation[triangle]
+        if np.linalg.norm(point-triangle_temp[3])>triangle_temp[4]:
+            triangle=False
+        else:
+            triangle+=1
+    except ValueError:
+        triangle=False
+    return triangle
+
+nb_points=10
 points=[np.array([random()*2,random()*2]) for i in range(nb_points)]
 plt.plot([i[0] for i in points],[i[1] for i in points],'ro')
 centre=sum(points)/nb_points
@@ -45,7 +57,7 @@ for point in points:
 maximum*=4
 orgA,orgB,orgC=centre+maximum*np.array([2**-0.5,2**-0.5]),centre+maximum*np.array([-0.9659258263,0.2588190451]),centre+maximum*np.array([0.2588190451,-0.9659258263])
 triangulation=[creation_triangle(orgA,orgB,orgC)]
-matr_relation=np.array([0])
+matr_relation=np.array([0])[np.newaxis]
 for point in points:
     #Cherche point se trouve dans quel triangle
     for i in range(len(triangulation)):
@@ -54,34 +66,9 @@ for point in points:
             break
     #Cherche si suppression des triangles voisins
     relations=matr_relation[triangle_base].tolist()
-    try:
-        triangle1=relations.index(1)
-        triangle_temp=triangulation[triangle1]
-        if np.linalg.norm(point-triangle_temp[3])>triangle_temp[4]:
-            triangle1=False
-        else:
-            triangle1+=1
-    except:
-        triangle1=False
-    try:
-        triangle2=relations.index(2)
-        triangle_temp=triangulation[triangle2]
-        if np.linalg.norm(point-triangle_temp[3])>triangle_temp[4]:
-            triangle2=False
-        else:
-            triangle2+=1
-    except:
-        triangle2=False
-    try:
-        triangle3=relations.index(3)
-        triangle_temp=triangulation[triangle3]
-        if np.linalg.norm(point-triangle_temp[3])>triangle_temp[4]:
-            triangle3=False
-        else:
-            triangle3+=1
-    except:
-        triangle3=False
-    print(triangle1,triangle2,triangle3)
+    triangle1=test_triangle(relations,triangulation,point,1)
+    triangle2=test_triangle(relations,triangulation,point,2)
+    triangle3=test_triangle(relations,triangulation,point,3)
     #Création du contour
     contour=[triangulation[triangle_base][0]]
     if triangle1:
@@ -152,30 +139,12 @@ for point in points:
         matr_relation=np.delete(matr_relation,(pos),axis=0)
         matr_relation=np.delete(matr_relation,(pos),axis=1)
         positions.remove(pos)
-    i=1
-    print(matr_relation)
-    for triangle in triangulation:
-        plt.plot([triangle[0][0],triangle[1][0],triangle[2][0],triangle[0][0]],[triangle[0][1],triangle[1][1],triangle[2][1],triangle[0][1]])
-        plt.text(sum([triangle[0][0],triangle[1][0],triangle[2][0]])/3,sum([triangle[0][1],triangle[1][1],triangle[2][1]])/3,str(i))
-        i+=1
-    plt.plot([i[0] for i in points],[i[1] for i in points],'ro')
-    plt.show()
-    wait=input('<ENTRER>')
-    plt.close()
-    
 
 triangles=[]
-ax=plt.gca()
-ax.cla()
-fig=plt.gcf()
-ax.set_xlim((-1,3))
-ax.set_ylim((-1,3))
 for triangle in triangulation:
     if (triangle[0] != orgA).all() and (triangle[0] != orgB).all() and (triangle[0] != orgC).all() and (triangle[1] != orgA).all() and (triangle[1] != orgB).all() and (triangle[1] != orgC).all() and (triangle[2] != orgA).all() and (triangle[2] != orgB).all() and (triangle[2] != orgC).all():
-        fig.gca().add_artist(plt.Circle(triangle[3],triangle[4],fill=False))
         triangles+=[[triangle[0],triangle[1],triangle[2]]]
         plt.plot([i[0] for i in triangles[-1]]+[triangles[-1][0][0]],[i[1] for i in triangles[-1]]+[triangles[-1][0][1]])
-plt.plot([i[0] for i in points],[i[1] for i in points],'ro')
 plt.show()
 
 
